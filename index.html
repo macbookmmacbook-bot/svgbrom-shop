@@ -1,1 +1,1133 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>BROM SHOP</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#050505;
+    color:white;
+}
+
+/* HEADER */
+header{
+    height:75px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 6%;
+    border-bottom:1px solid #222;
+    background:#080808;
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.logo{
+    font-size:28px;
+    font-weight:900;
+    letter-spacing:3px;
+}
+
+.logo span{
+    color:#00ff88;
+}
+
+.admin-btn{
+    background:#00ff88;
+    color:#000;
+    border:0;
+    padding:11px 20px;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* HERO */
+.hero{
+    min-height:430px;
+    padding:50px 7%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:30px;
+    background:
+        radial-gradient(circle at 80% 30%,#004d35 0%,transparent 30%),
+        linear-gradient(135deg,#030303,#0b1712);
+}
+
+.hero-text{
+    max-width:650px;
+}
+
+.status{
+    display:inline-block;
+    color:#00ff88;
+    border:1px solid #00ff88;
+    padding:7px 13px;
+    border-radius:20px;
+    font-size:13px;
+    margin-bottom:20px;
+}
+
+.hero h1{
+    font-size:70px;
+    line-height:1;
+    margin-bottom:15px;
+}
+
+.hero h1 span{
+    color:#00ff88;
+}
+
+.hero p{
+    color:#aaa;
+    font-size:18px;
+    margin-bottom:25px;
+}
+
+.telegram-box{
+    display:inline-flex;
+    align-items:center;
+    gap:15px;
+    padding:15px 20px;
+    background:#101010;
+    border:1px solid #00ff88;
+    border-radius:12px;
+}
+
+.telegram-box a{
+    color:#00ff88;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.phone{
+    color:#fff;
+}
+
+.shop-btn{
+    margin-top:20px;
+    padding:14px 25px;
+    border:0;
+    background:#00ff88;
+    color:#000;
+    font-weight:bold;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* SEARCH */
+.search-area{
+    padding:30px 7% 10px;
+}
+
+.search{
+    width:100%;
+    max-width:600px;
+    padding:16px;
+    border:1px solid #333;
+    border-radius:10px;
+    background:#111;
+    color:white;
+    font-size:16px;
+    outline:none;
+}
+
+.search:focus{
+    border-color:#00ff88;
+}
+
+/* PRODUCTS */
+.products{
+    padding:30px 7% 70px;
+}
+
+.products h2{
+    margin-bottom:25px;
+    font-size:30px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+
+.card{
+    background:#0d0d0d;
+    border:1px solid #222;
+    border-radius:15px;
+    overflow:hidden;
+    transition:.25s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    border-color:#00ff88;
+    box-shadow:0 0 25px #00ff8830;
+}
+
+.product-image{
+    height:220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#111;
+    overflow:hidden;
+}
+
+.product-image img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+.product-icon{
+    font-size:80px;
+}
+
+.card-info{
+    padding:18px;
+}
+
+.card h3{
+    font-size:20px;
+    margin-bottom:8px;
+}
+
+.description{
+    color:#888;
+    font-size:14px;
+    min-height:40px;
+    margin-bottom:12px;
+}
+
+.price{
+    color:#00ff88;
+    font-size:21px;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.buy-btn{
+    width:100%;
+    padding:12px;
+    background:#00ff88;
+    color:#000;
+    border:0;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* MODAL */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:#000b;
+    align-items:center;
+    justify-content:center;
+    z-index:500;
+    padding:20px;
+}
+
+.modal-box{
+    width:100%;
+    max-width:430px;
+    background:#101010;
+    border:1px solid #00ff88;
+    border-radius:15px;
+    padding:25px;
+    position:relative;
+}
+
+.close{
+    position:absolute;
+    right:18px;
+    top:13px;
+    font-size:25px;
+    cursor:pointer;
+    color:#aaa;
+}
+
+.modal h2{
+    margin-bottom:10px;
+}
+
+.modal-product{
+    color:#00ff88;
+    margin-bottom:20px;
+}
+
+.modal input{
+    width:100%;
+    padding:14px;
+    margin-bottom:12px;
+    background:#080808;
+    border:1px solid #333;
+    border-radius:8px;
+    color:white;
+    outline:none;
+}
+
+.modal input:focus{
+    border-color:#00ff88;
+}
+
+.submit-btn{
+    width:100%;
+    padding:14px;
+    background:#00ff88;
+    border:0;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* ADMIN */
+.admin-panel{
+    display:none;
+    padding:40px 7%;
+    background:#080808;
+    min-height:500px;
+}
+
+.admin-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.stat{
+    background:#111;
+    border:1px solid #222;
+    border-radius:12px;
+    padding:20px;
+}
+
+.stat small{
+    color:#888;
+}
+
+.stat strong{
+    display:block;
+    font-size:25px;
+    margin-top:8px;
+    color:#00ff88;
+}
+
+.order{
+    background:#111;
+    border:1px solid #222;
+    border-radius:10px;
+    padding:18px;
+    margin-bottom:12px;
+}
+
+.order b{
+    color:#00ff88;
+}
+
+.clear-btn{
+    background:#ff4444;
+    color:white;
+    border:0;
+    padding:10px 15px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+/* SUCCESS */
+.success{
+    text-align:center;
+}
+
+.success-icon{
+    font-size:55px;
+    margin-bottom:15px;
+}
+
+/* FOOTER */
+footer{
+    border-top:1px solid #222;
+    padding:30px 7%;
+    text-align:center;
+    color:#777;
+}
+
+footer a{
+    color:#00ff88;
+    text-decoration:none;
+}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+    .grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+
+@media(max-width:800px){
+    .hero{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .hero h1{
+        font-size:55px;
+    }
+
+    .grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:550px){
+    header{
+        padding:0 20px;
+    }
+
+    .logo{
+        font-size:22px;
+    }
+
+    .hero{
+        padding:40px 20px;
+    }
+
+    .hero h1{
+        font-size:45px;
+    }
+
+    .products,
+    .search-area,
+    .admin-panel{
+        padding-left:20px;
+        padding-right:20px;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .telegram-box{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="logo">BROM<span>SHOP</span></div>
+
+    <button class="admin-btn" onclick="openAdminLogin()">
+        ADMIN
+    </button>
+</header>
+
+
+<!-- HERO / 1-SLAYD -->
+<section class="hero">
+
+    <div class="hero-text">
+
+        <div class="status">
+            ● SYSTEM ONLINE
+        </div>
+
+        <h1>
+            BROM<br>
+            <span>SHOP</span>
+        </h1>
+
+        <p>
+            Zamonaviy mahsulotlar va sifatli texnika.
+            Buyurtma bering — admin siz bilan bog‘lanadi.
+        </p>
+
+        <!-- TELEGRAM VA TELEFON -->
+        <div class="telegram-box">
+
+            <div>
+                Telegram:
+                <a href="https://t.me/amirhonsh"
+                   target="_blank">
+                    @amirhonsh
+                </a>
+            </div>
+
+            <div class="phone">
+                📞 +998 33 531 84 94
+            </div>
+
+        </div>
+
+        <br>
+
+        <button class="shop-btn"
+                onclick="document.getElementById('products').scrollIntoView()">
+            SHOP NOW →
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- SEARCH -->
+<section class="search-area">
+
+    <input
+        class="search"
+        id="search"
+        placeholder="🔎 Mahsulot qidirish..."
+        oninput="showProducts()"
+    >
+
+</section>
+
+
+<!-- PRODUCTS -->
+<section class="products" id="products">
+
+    <h2>🛒 Mahsulotlar</h2>
+
+    <div class="grid" id="productGrid"></div>
+
+</section>
+
+
+<!-- ADMIN PANEL -->
+<section class="admin-panel" id="adminPanel">
+
+    <div class="admin-top">
+
+        <h2>⚙️ ADMIN PANEL</h2>
+
+        <button class="clear-btn"
+                onclick="clearOrders()">
+            Buyurtmalarni o‘chirish
+        </button>
+
+    </div>
+
+    <div class="stats">
+
+        <div class="stat">
+            <small>Buyurtmalar</small>
+            <strong id="adminCount">0</strong>
+        </div>
+
+        <div class="stat">
+            <small>Jami savdo</small>
+            <strong id="adminMoney">0 so'm</strong>
+        </div>
+
+        <div class="stat">
+            <small>Status</small>
+            <strong>ONLINE</strong>
+        </div>
+
+    </div>
+
+    <div id="orders"></div>
+
+</section>
+
+
+<!-- BUY MODAL -->
+<div class="modal" id="buyModal">
+
+    <div class="modal-box">
+
+        <div class="close"
+             onclick="closeModal('buyModal')">
+            ×
+        </div>
+
+        <h2>Buyurtma berish</h2>
+
+        <p class="modal-product"
+           id="modalProduct">
+        </p>
+
+        <input
+            id="buyerName"
+            placeholder="Ismingiz"
+        >
+
+        <input
+            id="buyerPhone"
+            placeholder="+998 XX XXX XX XX"
+        >
+
+        <button class="submit-btn"
+                onclick="sendOrder()">
+            BUYURTMA BERISH
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- SUCCESS MODAL -->
+<div class="modal" id="successModal">
+
+    <div class="modal-box success">
+
+        <div class="success-icon">
+            ✅
+        </div>
+
+        <h2>Buyurtma qabul qilindi!</h2>
+
+        <p style="color:#aaa;margin:15px 0;">
+            Telefon raqamingiz qabul qilindi.
+            Siz bilan admin bog‘lanadi.
+        </p>
+
+        <a href="https://t.me/amirhonsh"
+           target="_blank"
+           style="color:#00ff88;">
+            Telegram: @amirhonsh
+        </a>
+
+        <br><br>
+
+        <button class="submit-btn"
+                onclick="closeModal('successModal')">
+            YOPISH
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ADMIN LOGIN -->
+<div class="modal" id="adminLogin">
+
+    <div class="modal-box">
+
+        <div class="close"
+             onclick="closeModal('adminLogin')">
+            ×
+        </div>
+
+        <h2>🔐 Admin kirish</h2>
+
+        <br>
+
+        <input
+            type="password"
+            id="adminPassword"
+            placeholder="Admin parol"
+        >
+
+        <button class="submit-btn"
+                onclick="loginAdmin()">
+            KIRISH
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- FOOTER -->
+<footer>
+
+    <p>
+        BROM SHOP © 2026
+    </p>
+
+    <br>
+
+    <p>
+        Telegram:
+        <a href="https://t.me/amirhonsh"
+           target="_blank">
+            @amirhonsh
+        </a>
+    </p>
+
+    <p style="margin-top:8px;">
+        📞 +998 33 531 84 94
+    </p>
+
+</footer>
+
+
+<script>
+
+/* =========================
+   MAHSULOTLAR
+   50 TAGACHA QO'SHISH MUMKIN
+========================= */
+
+const products = [
+
+    {
+        name:"BROM 220W",
+        price:111,
+        description:"220W quvvatli zamonaviy qurilma.",
+        image:"brom.jpg",
+        icon:"⚡"
+    },
+
+    {
+        name:"BROM PRO",
+        price:799000,
+        description:"Kuchli va tez ishlaydigan professional model.",
+        image:"",
+        icon:"🔥"
+    },
+
+    {
+        name:"BROM MAX",
+        price:999000,
+        description:"Yuqori quvvatli yangi avlod model.",
+        image:"",
+        icon:"🚀"
+    },
+
+    {
+        name:"BROM ULTRA",
+        price:1299000,
+        description:"Premium darajadagi kuchli model.",
+        image:"",
+        icon:"💎"
+    },
+
+    {
+        name:"BROM MINI",
+        price:299000,
+        description:"Kichik, qulay va olib yurishga oson.",
+        image:"",
+        icon:"📱"
+    },
+
+    {
+        name:"BROM POWER",
+        price:599000,
+        description:"Kuchli batareya va uzoq ishlash.",
+        image:"",
+        icon:"🔋"
+    },
+
+    {
+        name:"BROM FAST",
+        price:699000,
+        description:"Tezkor ishlash uchun yaratilgan.",
+        image:"",
+        icon:"⚡"
+    },
+
+    {
+        name:"BROM SMART",
+        price:899000,
+        description:"Smart texnologiyali zamonaviy model.",
+        image:"",
+        icon:"🤖"
+    },
+
+    {
+        name:"BROM X",
+        price:1099000,
+        description:"Yangi dizayn va kuchli imkoniyatlar.",
+        image:"",
+        icon:"🛸"
+    },
+
+    {
+        name:"BROM X PRO",
+        price:1499000,
+        description:"Professional foydalanish uchun.",
+        image:"",
+        icon:"💠"
+    },
+
+    {
+        name:"BROM TURBO",
+        price:1199000,
+        description:"Turbo tezlikdagi kuchli model.",
+        image:"",
+        icon:"🏎️"
+    },
+
+    {
+        name:"BROM PREMIUM",
+        price:1799000,
+        description:"Premium sifat va zamonaviy dizayn.",
+        image:"",
+        icon:"👑"
+    }
+
+];
+
+
+/* PUL FORMAT */
+
+function money(number){
+
+    return number.toLocaleString("uz-UZ") + " so'm";
+
+}
+
+
+/* MAHSULOTLARNI CHIQARISH */
+
+function showProducts(){
+
+    const grid =
+        document.getElementById("productGrid");
+
+    const search =
+        document
+        .getElementById("search")
+        .value
+        .toLowerCase();
+
+    const filtered =
+        products.filter(product =>
+            product.name
+            .toLowerCase()
+            .includes(search)
+        );
+
+    grid.innerHTML = "";
+
+    filtered.forEach((product,index)=>{
+
+        let imageHTML = "";
+
+        if(product.image){
+
+            imageHTML = `
+                <img
+                    src="${product.image}"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
+                >
+                <div class="product-icon"
+                     style="display:none;">
+                    ${product.icon}
+                </div>
+            `;
+
+        }else{
+
+            imageHTML = `
+                <div class="product-icon">
+                    ${product.icon}
+                </div>
+            `;
+
+        }
+
+        grid.innerHTML += `
+
+            <div class="card">
+
+                <div class="product-image">
+                    ${imageHTML}
+                </div>
+
+                <div class="card-info">
+
+                    <h3>
+                        ${product.name}
+                    </h3>
+
+                    <div class="description">
+                        ${product.description}
+                    </div>
+
+                    <div class="price">
+                        ${money(product.price)}
+                    </div>
+
+                    <button
+                        class="buy-btn"
+                        onclick="openBuy(${products.indexOf(product)})">
+                        SOTIB OLISH
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+/* BUY MODAL */
+
+let selectedProduct = null;
+
+function openBuy(index){
+
+    selectedProduct =
+        products[index];
+
+    document.getElementById("modalProduct")
+        .textContent =
+        selectedProduct.name +
+        " — " +
+        money(selectedProduct.price);
+
+    document.getElementById("buyModal")
+        .style.display = "flex";
+
+}
+
+
+/* BUYURTMA */
+
+function sendOrder(){
+
+    const name =
+        document
+        .getElementById("buyerName")
+        .value
+        .trim();
+
+    const phone =
+        document
+        .getElementById("buyerPhone")
+        .value
+        .trim();
+
+    if(!name || !phone){
+
+        alert("Iltimos, ism va telefon raqamingizni kiriting!");
+
+        return;
+    }
+
+    const orders =
+        JSON.parse(
+            localStorage.getItem("bromOrders") || "[]"
+        );
+
+    orders.push({
+
+        id:Date.now(),
+
+        name:name,
+
+        phone:phone,
+
+        product:selectedProduct.name,
+
+        price:selectedProduct.price,
+
+        time:new Date().toLocaleString("uz-UZ")
+
+    });
+
+    localStorage.setItem(
+        "bromOrders",
+        JSON.stringify(orders)
+    );
+
+    document.getElementById("buyerName").value = "";
+    document.getElementById("buyerPhone").value = "";
+
+    closeModal("buyModal");
+
+    document.getElementById("successModal")
+        .style.display = "flex";
+
+}
+
+
+/* MODAL YOPISH */
+
+function closeModal(id){
+
+    document.getElementById(id)
+        .style.display = "none";
+
+}
+
+
+/* ADMIN LOGIN */
+
+function openAdminLogin(){
+
+    document.getElementById("adminLogin")
+        .style.display = "flex";
+
+}
+
+
+function loginAdmin(){
+
+    const password =
+        document
+        .getElementById("adminPassword")
+        .value;
+
+    if(password === "1983 xushnutbek"){
+
+        closeModal("adminLogin");
+
+        document.getElementById("adminPanel")
+            .style.display = "block";
+
+        updateAdmin();
+
+        document.getElementById("adminPanel")
+            .scrollIntoView();
+
+    }else{
+
+        alert("Parol noto‘g‘ri!");
+
+    }
+
+}
+
+
+/* ADMIN MA'LUMOTLARI */
+
+function updateAdmin(){
+
+    const orders =
+        JSON.parse(
+            localStorage.getItem("bromOrders") || "[]"
+        );
+
+    document.getElementById("adminCount")
+        .textContent = orders.length;
+
+    const totalSales =
+        orders.reduce(
+            (sum,order) =>
+            sum + order.price,
+            0
+        );
+
+    document.getElementById("adminMoney")
+        .textContent =
+        money(totalSales);
+
+    const container =
+        document.getElementById("orders");
+
+    if(orders.length === 0){
+
+        container.innerHTML = `
+            <div class="order">
+                Hozircha buyurtmalar yo‘q.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML = "";
+
+    [...orders]
+    .reverse()
+    .forEach(order=>{
+
+        container.innerHTML += `
+
+            <div class="order">
+
+                <p>
+                    👤 Ism:
+                    <b>${order.name}</b>
+                </p>
+
+                <p>
+                    📞 Telefon:
+                    <b>${order.phone}</b>
+                </p>
+
+                <p>
+                    🛒 Mahsulot:
+                    <b>${order.product}</b>
+                </p>
+
+                <p>
+                    💰 Narx:
+                    <b>${money(order.price)}</b>
+                </p>
+
+                <p>
+                    🕐 Vaqt:
+                    ${order.time}
+                </p>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+/* BUYURTMALARNI O'CHIRISH */
+
+function clearOrders(){
+
+    if(
+        confirm(
+            "Barcha buyurtmalar o‘chirilsinmi?"
+        )
+    ){
+
+        localStorage.removeItem(
+            "bromOrders"
+        );
+
+        updateAdmin();
+
+    }
+
+}
+
+
+/* START */
+
+showProducts();
+
+</script>
+
+</body>
+</html> 
