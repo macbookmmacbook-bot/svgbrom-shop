@@ -2,548 +2,521 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BROM SHOP</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-font-family:Arial,Helvetica,sans-serif;
-background:#050505;
-color:#fff;
-min-height:100vh
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
-button,input,textarea{font:inherit}
-button{cursor:pointer}
-a{text-decoration:none;color:inherit}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#050505;
+    color:white;
+}
 
 header{
-height:72px;
-position:sticky;
-top:0;
-z-index:100;
-background:rgba(5,5,5,.92);
-backdrop-filter:blur(18px);
-border-bottom:1px solid #222
-}
-
-.nav{
-max-width:1200px;
-height:100%;
-margin:auto;
-padding:0 20px;
-display:flex;
-align-items:center;
-justify-content:space-between
+    height:75px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 6%;
+    border-bottom:1px solid #222;
+    background:#080808;
+    position:sticky;
+    top:0;
+    z-index:100;
 }
 
 .logo{
-font-size:24px;
-font-weight:900;
-letter-spacing:2px
+    font-size:28px;
+    font-weight:900;
+    letter-spacing:3px;
 }
 
-.logo span{color:#888}
-
-.nav-buttons{
-display:flex;
-align-items:center;
-gap:10px
-}
-
-.online{
-font-size:12px;
-color:#777;
-display:flex;
-align-items:center;
-gap:7px
-}
-
-.dot{
-width:8px;
-height:8px;
-background:#35d07f;
-border-radius:50%;
-box-shadow:0 0 12px #35d07f
+.logo span{
+    color:#00ff88;
 }
 
 .admin-btn{
-background:#fff;
-color:#000;
-border:0;
-padding:11px 16px;
-border-radius:10px;
-font-weight:800
+    background:#00ff88;
+    color:#000;
+    border:0;
+    padding:11px 20px;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
 .hero{
-max-width:1200px;
-margin:auto;
-padding:100px 20px 70px;
-text-align:center
+    min-height:430px;
+    padding:50px 7%;
+    display:flex;
+    align-items:center;
+    background:
+        radial-gradient(circle at 80% 30%,#004d35 0%,transparent 30%),
+        linear-gradient(135deg,#030303,#0b1712);
 }
 
-.badge{
-display:inline-block;
-border:1px solid #292929;
-padding:8px 14px;
-border-radius:50px;
-color:#888;
-font-size:12px;
-margin-bottom:25px
+.hero-text{
+    max-width:650px;
+}
+
+.status{
+    display:inline-block;
+    color:#00ff88;
+    border:1px solid #00ff88;
+    padding:7px 13px;
+    border-radius:20px;
+    font-size:13px;
+    margin-bottom:20px;
 }
 
 .hero h1{
-font-size:clamp(55px,10vw,110px);
-line-height:.85;
-letter-spacing:-6px;
-font-weight:1000
+    font-size:70px;
+    line-height:1;
+    margin-bottom:15px;
 }
 
-.hero h1 span{color:#555}
+.hero h1 span{
+    color:#00ff88;
+}
 
 .hero p{
-max-width:600px;
-margin:28px auto 0;
-color:#888;
-font-size:17px;
-line-height:1.6
+    color:#aaa;
+    font-size:18px;
+    margin-bottom:25px;
 }
 
-.hero-buttons{
-margin-top:30px;
-display:flex;
-justify-content:center;
-gap:10px;
-flex-wrap:wrap
+.telegram-box{
+    display:inline-flex;
+    align-items:center;
+    gap:15px;
+    padding:15px 20px;
+    background:#101010;
+    border:1px solid #00ff88;
+    border-radius:12px;
 }
 
-.main-btn{
-border:0;
-background:#fff;
-color:#000;
-padding:14px 22px;
-border-radius:11px;
-font-weight:900
+.telegram-box a{
+    color:#00ff88;
+    text-decoration:none;
+    font-weight:bold;
 }
 
-.second-btn{
-border:1px solid #333;
-background:#101010;
-color:#fff;
-padding:14px 22px;
-border-radius:11px
+.phone{
+    color:#fff;
 }
 
-.container{
-max-width:1200px;
-margin:auto;
-padding:0 20px
+.shop-btn{
+    margin-top:20px;
+    padding:14px 25px;
+    border:0;
+    background:#00ff88;
+    color:#000;
+    font-weight:bold;
+    border-radius:8px;
+    cursor:pointer;
 }
 
-.section{
-padding:60px 0
+.search-area{
+    padding:30px 7% 10px;
 }
 
-.section-title{
-font-size:34px;
-font-weight:900;
-margin-bottom:8px
+.search{
+    width:100%;
+    max-width:600px;
+    padding:16px;
+    border:1px solid #333;
+    border-radius:10px;
+    background:#111;
+    color:white;
+    font-size:16px;
+    outline:none;
 }
 
-.section-desc{
-color:#666;
-margin-bottom:30px
+.search:focus{
+    border-color:#00ff88;
 }
 
 .products{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:18px
+    padding:30px 7% 70px;
+}
+
+.products h2{
+    margin-bottom:25px;
+    font-size:30px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
 }
 
 .card{
-background:#111;
-border:1px solid #242424;
-border-radius:18px;
-overflow:hidden;
-transition:.25s
+    background:#0d0d0d;
+    border:1px solid #222;
+    border-radius:15px;
+    overflow:hidden;
+    transition:.25s;
 }
 
 .card:hover{
-transform:translateY(-5px);
-border-color:#444
+    transform:translateY(-5px);
+    border-color:#00ff88;
+    box-shadow:0 0 25px #00ff8830;
 }
 
-.card-image{
-height:230px;
-background:#181818;
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:hidden
+.product-image{
+    height:220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#111;
+    overflow:hidden;
 }
 
-.card-image img{
-width:100%;
-height:100%;
-object-fit:cover
+.product-image img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
 }
 
-.no-image{
-font-size:55px;
-opacity:.25
+.product-icon{
+    font-size:80px;
 }
 
-.card-body{
-padding:18px
+.card-info{
+    padding:18px;
 }
 
-.category{
-font-size:10px;
-color:#666;
-text-transform:uppercase;
-letter-spacing:1px;
-margin-bottom:7px
-}
-
-.name{
-font-size:19px;
-font-weight:900;
-margin-bottom:8px
+.card h3{
+    font-size:20px;
+    margin-bottom:8px;
 }
 
 .description{
-font-size:13px;
-line-height:1.5;
-color:#777;
-min-height:40px;
-margin-bottom:15px
-}
-
-.bottom{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:8px
+    color:#888;
+    font-size:14px;
+    min-height:40px;
+    margin-bottom:12px;
 }
 
 .price{
-font-size:17px;
-font-weight:900
+    color:#00ff88;
+    font-size:21px;
+    font-weight:bold;
+    margin-bottom:15px;
 }
 
-.buy{
-background:#fff;
-border:0;
-color:#000;
-padding:10px 12px;
-border-radius:9px;
-font-size:12px;
-font-weight:900
-}
-
-.empty{
-grid-column:1/-1;
-text-align:center;
-padding:70px 20px;
-border:1px dashed #333;
-border-radius:18px;
-color:#666
-}
-
-.features{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:15px
-}
-
-.feature{
-background:#101010;
-border:1px solid #222;
-padding:25px;
-border-radius:17px
-}
-
-.feature-icon{
-font-size:30px;
-margin-bottom:15px
-}
-
-.feature h3{margin-bottom:8px}
-.feature p{color:#666;line-height:1.6;font-size:14px}
-
-footer{
-margin-top:70px;
-border-top:1px solid #222;
-padding:30px 20px;
-color:#666
-}
-
-.footer-inner{
-max-width:1200px;
-margin:auto;
-display:flex;
-justify-content:space-between
+.buy-btn{
+    width:100%;
+    padding:12px;
+    background:#00ff88;
+    color:#000;
+    border:0;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
 .modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.78);
-backdrop-filter:blur(10px);
-z-index:1000;
-display:none;
-align-items:center;
-justify-content:center;
-padding:20px
+    display:none;
+    position:fixed;
+    inset:0;
+    background:#000b;
+    align-items:center;
+    justify-content:center;
+    z-index:500;
+    padding:20px;
 }
 
-.modal.show{display:flex}
-
-.box{
-background:#111;
-border:1px solid #333;
-border-radius:20px;
-width:min(1050px,100%);
-max-height:92vh;
-overflow:auto;
-padding:25px
-}
-
-.small-box{width:min(470px,100%)}
-
-.modal-head{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:25px
+.modal-box{
+    width:100%;
+    max-width:450px;
+    max-height:90vh;
+    overflow-y:auto;
+    background:#101010;
+    border:1px solid #00ff88;
+    border-radius:15px;
+    padding:25px;
+    position:relative;
 }
 
 .close{
-width:38px;
-height:38px;
-border:1px solid #333;
-background:#181818;
-color:#fff;
-border-radius:9px;
-font-size:20px
+    position:absolute;
+    right:18px;
+    top:13px;
+    font-size:25px;
+    cursor:pointer;
+    color:#aaa;
 }
 
-.input-group{margin-bottom:15px}
-
-.input-group label{
-display:block;
-font-size:13px;
-color:#999;
-margin-bottom:7px
+.modal h2{
+    margin-bottom:15px;
 }
 
-.input{
-width:100%;
-padding:13px;
-border:1px solid #333;
-background:#080808;
-color:#fff;
-border-radius:10px;
-outline:none
+.modal-product{
+    color:#00ff88;
+    margin-bottom:20px;
 }
 
-.input:focus{border-color:#777}
-
-textarea.input{
-height:100px;
-resize:vertical
+.modal input,
+.modal textarea,
+.modal select{
+    width:100%;
+    padding:14px;
+    margin-bottom:12px;
+    background:#080808;
+    border:1px solid #333;
+    border-radius:8px;
+    color:white;
+    outline:none;
+    font-family:Arial;
 }
 
-.login-btn{
-width:100%;
-padding:14px;
-background:#fff;
-border:0;
-border-radius:10px;
-font-weight:900
+.modal textarea{
+    min-height:100px;
+    resize:vertical;
 }
 
-.error{
-display:none;
-background:#261010;
-border:1px solid #552222;
-color:#ff6b6b;
-padding:11px;
-border-radius:9px;
-margin-bottom:15px;
-font-size:13px
+.modal input:focus,
+.modal textarea:focus,
+.modal select:focus{
+    border-color:#00ff88;
 }
 
-.error.show{display:block}
-
-.admin-content{display:none}
-.admin-content.show{display:block}
-
-.admin-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px
+.submit-btn{
+    width:100%;
+    padding:14px;
+    background:#00ff88;
+    border:0;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-.admin-card{
-background:#090909;
-border:1px solid #252525;
-border-radius:15px;
-padding:20px
-}
-
-.admin-card h3{margin-bottom:18px}
-
-.add-btn{
-width:100%;
-padding:14px;
-background:#fff;
-color:#000;
-border:0;
-border-radius:10px;
-font-weight:900
-}
-
-.admin-list{
-display:flex;
-flex-direction:column;
-gap:10px;
-max-height:550px;
-overflow:auto
-}
-
-.admin-item{
-display:flex;
-align-items:center;
-gap:12px;
-background:#151515;
-border:1px solid #262626;
-padding:10px;
-border-radius:12px
-}
-
-.admin-img{
-width:55px;
-height:55px;
-border-radius:9px;
-background:#222;
-object-fit:cover;
-flex-shrink:0
-}
-
-.admin-info{
-flex:1;
-min-width:0
-}
-
-.admin-name{
-font-weight:800;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis
-}
-
-.admin-price{
-color:#777;
-font-size:12px;
-margin-top:4px
-}
-
-.delete{
-border:1px solid #542020;
-background:#241010;
-color:#ff6666;
-padding:9px;
-border-radius:8px
-}
-
-.logout{
-background:transparent;
-border:1px solid #333;
-color:#fff;
-padding:9px 13px;
-border-radius:9px
+.admin-panel{
+    display:none;
+    padding:40px 7%;
+    background:#080808;
+    min-height:500px;
 }
 
 .admin-top{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
 }
 
-.loading{
-grid-column:1/-1;
-text-align:center;
-padding:60px;
-color:#666
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    margin-bottom:25px;
 }
 
-.spinner{
-width:35px;
-height:35px;
-border:3px solid #292929;
-border-top-color:#fff;
-border-radius:50%;
-margin:0 auto 15px;
-animation:spin .7s linear infinite
+.stat{
+    background:#111;
+    border:1px solid #222;
+    border-radius:12px;
+    padding:20px;
 }
 
-@keyframes spin{
-to{transform:rotate(360deg)}
+.stat small{
+    color:#888;
 }
 
-.toast{
-position:fixed;
-right:20px;
-bottom:20px;
-z-index:3000;
-background:#181818;
-border:1px solid #333;
-padding:15px 18px;
-border-radius:11px;
-transform:translateY(100px);
-opacity:0;
-transition:.25s
+.stat strong{
+    display:block;
+    font-size:25px;
+    margin-top:8px;
+    color:#00ff88;
 }
 
-.toast.show{
-transform:translateY(0);
-opacity:1
+.admin-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:25px;
 }
 
-.order-product{
-background:#181818;
-padding:15px;
-border-radius:10px;
-margin-bottom:20px
+.admin-action{
+    background:#00ff88;
+    color:#000;
+    border:0;
+    padding:12px 18px;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-@media(max-width:950px){
-.products{grid-template-columns:repeat(3,1fr)}
+.clear-btn{
+    background:#ff4444;
+    color:white;
+    border:0;
+    padding:10px 15px;
+    border-radius:7px;
+    cursor:pointer;
 }
 
-@media(max-width:700px){
-.online{display:none}
-.hero{padding-top:70px}
-.products{grid-template-columns:repeat(2,1fr)}
-.features{grid-template-columns:1fr}
-.admin-grid{grid-template-columns:1fr}
-.footer-inner{
-flex-direction:column;
-gap:10px;
-text-align:center
-}
+.admin-section{
+    background:#0d0d0d;
+    border:1px solid #222;
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:25px;
 }
 
-@media(max-width:450px){
-.products{grid-template-columns:1fr}
-.hero h1{letter-spacing:-4px}
+.admin-section h3{
+    margin-bottom:18px;
+}
+
+.admin-product{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    background:#111;
+    border:1px solid #222;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:10px;
+}
+
+.admin-product-info{
+    flex:1;
+}
+
+.admin-product-info b{
+    color:#00ff88;
+}
+
+.admin-product-buttons{
+    display:flex;
+    gap:8px;
+}
+
+.edit-btn{
+    background:#00aaff;
+    color:white;
+    border:0;
+    padding:9px 13px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+.delete-btn{
+    background:#ff4444;
+    color:white;
+    border:0;
+    padding:9px 13px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+.order{
+    background:#111;
+    border:1px solid #222;
+    border-radius:10px;
+    padding:18px;
+    margin-bottom:12px;
+}
+
+.order b{
+    color:#00ff88;
+}
+
+.success{
+    text-align:center;
+}
+
+.success-icon{
+    font-size:55px;
+    margin-bottom:15px;
+}
+
+footer{
+    border-top:1px solid #222;
+    padding:30px 7%;
+    text-align:center;
+    color:#777;
+}
+
+footer a{
+    color:#00ff88;
+    text-decoration:none;
+}
+
+.empty{
+    color:#777;
+    padding:15px 0;
+}
+
+@media(max-width:1100px){
+    .grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+
+@media(max-width:800px){
+    .hero h1{
+        font-size:55px;
+    }
+
+    .grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .admin-product{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+
+@media(max-width:550px){
+    header{
+        padding:0 20px;
+    }
+
+    .logo{
+        font-size:22px;
+    }
+
+    .hero{
+        padding:40px 20px;
+    }
+
+    .hero h1{
+        font-size:45px;
+    }
+
+    .products,
+    .search-area,
+    .admin-panel{
+        padding-left:20px;
+        padding-right:20px;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .telegram-box{
+        flex-direction:column;
+        align-items:flex-start;
+    }
 }
 </style>
 </head>
@@ -551,1312 +524,1422 @@ text-align:center
 <body>
 
 <header>
-<div class="nav">
+    <div class="logo">BROM<span>SHOP</span></div>
 
-<div class="logo">
-BROM <span>SHOP</span>
-</div>
-
-<div class="nav-buttons">
-
-<div class="online">
-<span class="dot"></span>
-SYSTEM ONLINE
-</div>
-
-<button class="admin-btn" onclick="openAdmin()">
-⚙️ ADMIN
-</button>
-
-</div>
-</div>
+    <button class="admin-btn" onclick="openAdminLogin()">
+        ADMIN
+    </button>
 </header>
-
 
 <section class="hero">
 
-<div class="badge">
-⚡ PREMIUM TECH STORE
-</div>
+    <div class="hero-text">
 
-<h1>
-BROM<br>
-<span>SHOP</span>
-</h1>
+        <div class="status">
+            ● SYSTEM ONLINE
+        </div>
 
-<p>
-Zamonaviy mahsulotlar va sifatli texnika.
-Kerakli mahsulotni tanlang va buyurtma bering.
-</p>
+        <h1>
+            BROM<br>
+            <span>SHOP</span>
+        </h1>
 
-<div class="hero-buttons">
+        <p>
+            Zamonaviy mahsulotlar va sifatli texnika.
+            Buyurtma bering — admin siz bilan bog‘lanadi.
+        </p>
 
-<button
-class="main-btn"
-onclick="document.getElementById('products').scrollIntoView()">
-SHOP NOW →
-</button>
+        <div class="telegram-box">
 
-<a
-class="second-btn"
-href="https://t.me/amirhonsh"
-target="_blank">
-TELEGRAM
-</a>
+            <div>
+                Telegram:
+                <a href="https://t.me/amirhonsh" target="_blank">
+                    @amirhonsh
+                </a>
+            </div>
 
-</div>
+            <div class="phone">
+                📞 +998 33 531 84 94
+            </div>
 
-</section>
+        </div>
 
+        <br>
 
-<section class="section" id="products">
+        <button
+            class="shop-btn"
+            onclick="document.getElementById('products').scrollIntoView()">
+            SHOP NOW →
+        </button>
 
-<div class="container">
-
-<div class="section-title">
-🛒 Mahsulotlar
-</div>
-
-<div class="section-desc">
-Bizning mavjud mahsulotlarimiz
-</div>
-
-<div class="products" id="productList">
-
-<div class="loading">
-<div class="spinner"></div>
-Mahsulotlar yuklanmoqda...
-</div>
-
-</div>
-
-</div>
+    </div>
 
 </section>
 
+<section class="search-area">
 
-<section class="section">
+    <input
+        class="search"
+        id="search"
+        placeholder="🔎 Mahsulot qidirish..."
+        oninput="showProducts()">
 
-<div class="container">
-
-<div class="section-title">
-Nega BROM?
-</div>
-
-<div class="section-desc">
-Siz uchun qulay xarid
-</div>
-
-<div class="features">
-
-<div class="feature">
-<div class="feature-icon">⚡</div>
-<h3>Tezkor</h3>
-<p>
-Mahsulotni tanlang va tezda buyurtma bering.
-</p>
-</div>
-
-<div class="feature">
-<div class="feature-icon">🛡️</div>
-<h3>Ishonchli</h3>
-<p>
-Mahsulotlar markaziy bazada saqlanadi.
-</p>
-</div>
-
-<div class="feature">
-<div class="feature-icon">📱</div>
-<h3>Qulay</h3>
-<p>
-Telefon va kompyuterda bir xil ishlaydi.
-</p>
-</div>
-
-</div>
-</div>
 </section>
 
+<section class="products" id="products">
+
+    <h2>🛒 Mahsulotlar</h2>
+
+    <div class="grid" id="productGrid"></div>
+
+</section>
+
+<section class="admin-panel" id="adminPanel">
+
+    <div class="admin-top">
+
+        <h2>⚙️ ADMIN PANEL</h2>
+
+        <button class="clear-btn" onclick="clearOrders()">
+            Buyurtmalarni o‘chirish
+        </button>
+
+    </div>
+
+    <div class="stats">
+
+        <div class="stat">
+            <small>Buyurtmalar</small>
+            <strong id="adminCount">0</strong>
+        </div>
+
+        <div class="stat">
+            <small>Jami savdo</small>
+            <strong id="adminMoney">0 so'm</strong>
+        </div>
+
+        <div class="stat">
+            <small>Status</small>
+            <strong>ONLINE</strong>
+        </div>
+
+    </div>
+
+    <div class="admin-actions">
+
+        <button class="admin-action" onclick="openProductForm()">
+            ➕ MAHSULOT QO‘SHISH
+        </button>
+
+    </div>
+
+    <div class="admin-section">
+
+        <h3>📦 Mahsulotlarni boshqarish</h3>
+
+        <div id="adminProducts"></div>
+
+    </div>
+
+    <div class="admin-section">
+
+        <h3>🛒 Buyurtmalar</h3>
+
+        <div id="orders"></div>
+
+    </div>
+
+</section>
+
+<div class="modal" id="buyModal">
+
+    <div class="modal-box">
+
+        <div class="close" onclick="closeModal('buyModal')">
+            ×
+        </div>
+
+        <h2>Buyurtma berish</h2>
+
+        <p class="modal-product" id="modalProduct"></p>
+
+        <input
+            id="buyerName"
+            placeholder="Ismingiz">
+
+        <input
+            id="buyerPhone"
+            placeholder="+998 XX XXX XX XX">
+
+        <button class="submit-btn" onclick="sendOrder()">
+            BUYURTMA BERISH
+        </button>
+
+    </div>
+
+</div>
+
+<div class="modal" id="successModal">
+
+    <div class="modal-box success">
+
+        <div class="success-icon">
+            ✅
+        </div>
+
+        <h2>Buyurtma qabul qilindi!</h2>
+
+        <p style="color:#aaa;margin:15px 0;">
+            Telefon raqamingiz qabul qilindi.
+            Siz bilan admin bog‘lanadi.
+        </p>
+
+        <a href="https://t.me/amirhonsh"
+           target="_blank"
+           style="color:#00ff88;">
+            Telegram: @amirhonsh
+        </a>
+
+        <br><br>
+
+        <button
+            class="submit-btn"
+            onclick="closeModal('successModal')">
+            YOPISH
+        </button>
+
+    </div>
+
+</div>
+
+<div class="modal" id="adminLogin">
+
+    <div class="modal-box">
+
+        <div class="close" onclick="closeModal('adminLogin')">
+            ×
+        </div>
+
+        <h2>🔐 Admin kirish</h2>
+
+        <br>
+
+        <input
+            type="password"
+            id="adminPassword"
+            placeholder="Admin parol">
+
+        <button class="submit-btn" onclick="loginAdmin()">
+            KIRISH
+        </button>
+
+    </div>
+
+</div>
+
+<div class="modal" id="productModal">
+
+    <div class="modal-box">
+
+        <div class="close" onclick="closeModal('productModal')">
+            ×
+        </div>
+
+        <h2 id="productModalTitle">
+            ➕ Mahsulot qo‘shish
+        </h2>
+
+        <br>
+
+        <input
+            id="productName"
+            placeholder="Mahsulot nomi">
+
+        <input
+            id="productPrice"
+            type="number"
+            placeholder="Narxi">
+
+        <input
+            id="productImage"
+            placeholder="Rasm URL manzili">
+
+        <textarea
+            id="productDescription"
+            placeholder="Mahsulot tavsifi"></textarea>
+
+        <input
+            id="productCategory"
+            placeholder="Kategoriya">
+
+        <input
+            id="productStock"
+            type="number"
+            placeholder="Ombordagi soni">
+
+        <button
+            class="submit-btn"
+            onclick="saveProduct()">
+            💾 SAQLASH
+        </button>
+
+    </div>
+
+</div>
 
 <footer>
-<div class="footer-inner">
-<div>BROM SHOP © 2026</div>
-<a href="https://t.me/amirhonsh">
-Telegram: @amirhonsh
-</a>
-</div>
+
+    <p>BROM SHOP © 2026</p>
+
+    <br>
+
+    <p>
+        Telegram:
+        <a href="https://t.me/amirhonsh" target="_blank">
+            @amirhonsh
+        </a>
+    </p>
+
+    <p style="margin-top:8px;">
+        📞 +998 33 531 84 94
+    </p>
+
 </footer>
-
-
-<!-- ADMIN -->
-
-<div class="modal" id="adminModal">
-
-<div class="box">
-
-<div id="loginPanel">
-
-<div class="modal-head">
-
-<h2>🔐 ADMIN PANEL</h2>
-
-<button class="close" onclick="closeAdmin()">
-×
-</button>
-
-</div>
-
-<div class="error" id="loginError">
-Parol noto‘g‘ri.
-</div>
-
-<div class="input-group">
-
-<label>Admin paroli</label>
-
-<input
-class="input"
-type="password"
-id="adminPassword"
-placeholder="Parol"
-onkeydown="if(event.key==='Enter')login()">
-
-</div>
-
-<button class="login-btn" onclick="login()">
-KIRISH
-</button>
-
-</div>
-
-
-<div class="admin-content" id="adminPanel">
-
-<div class="modal-head">
-
-<h2>⚙️ BROM SHOP ADMIN</h2>
-
-<button class="close" onclick="closeAdmin()">
-×
-</button>
-
-</div>
-
-<div class="admin-top">
-
-<div>
-<div style="font-weight:900">
-Mahsulot boshqaruvi
-</div>
-
-<div style="color:#666;font-size:12px;margin-top:5px">
-Mahsulot qo‘shish va o‘chirish
-</div>
-</div>
-
-<button class="logout" onclick="logout()">
-CHIQISH
-</button>
-
-</div>
-
-
-<div class="admin-grid">
-
-
-<div class="admin-card">
-
-<h3>➕ Mahsulot qo‘shish</h3>
-
-<div class="error" id="productError"></div>
-
-
-<div class="input-group">
-<label>Mahsulot nomi</label>
-
-<input
-class="input"
-id="name"
-placeholder="BROM PRO">
-</div>
-
-
-<div class="input-group">
-<label>Narxi</label>
-
-<input
-class="input"
-id="price"
-type="number"
-placeholder="799000">
-</div>
-
-
-<div class="input-group">
-<label>Kategoriya</label>
-
-<input
-class="input"
-id="category"
-placeholder="Elektronika">
-</div>
-
-
-<div class="input-group">
-<label>Rasm URL</label>
-
-<input
-class="input"
-id="image"
-placeholder="https://...">
-</div>
-
-
-<div class="input-group">
-<label>Tavsif</label>
-
-<textarea
-class="input"
-id="description"
-placeholder="Mahsulot haqida..."></textarea>
-</div>
-
-
-<button
-class="add-btn"
-onclick="addProduct()">
-➕ MAHSULOT QO‘SHISH
-</button>
-
-</div>
-
-
-<div class="admin-card">
-
-<h3>📦 Mahsulotlar</h3>
-
-<div
-class="admin-list"
-id="adminList">
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-
-<!-- ORDER -->
-
-<div class="modal" id="orderModal">
-
-<div class="box small-box">
-
-<div class="modal-head">
-
-<h2>🛒 Buyurtma</h2>
-
-<button class="close" onclick="closeOrder()">
-×
-</button>
-
-</div>
-
-
-<div
-class="order-product"
-id="orderProduct">
-</div>
-
-
-<div class="input-group">
-<label>Ismingiz</label>
-
-<input
-class="input"
-id="customerName"
-placeholder="Ismingiz">
-</div>
-
-
-<div class="input-group">
-<label>Telefon</label>
-
-<input
-class="input"
-id="customerPhone"
-placeholder="+998...">
-</div>
-
-
-<div class="input-group">
-<label>Izoh</label>
-
-<textarea
-class="input"
-id="customerComment"
-placeholder="Izoh..."></textarea>
-</div>
-
-
-<button
-class="add-btn"
-onclick="sendOrder()">
-BUYURTMA BERISH
-</button>
-
-</div>
-</div>
-
-
-<div class="toast" id="toast"></div>
-
 
 <script>
 
-/* =====================================================
+/* =========================
    SUPABASE
-===================================================== */
+========================= */
 
 const SUPABASE_URL =
-"https://zijbgbvnukumoolxpwsc.supabase.co";
+    "https://zijbgbvnukumoolxpwsc.supabase.co";
 
 /*
-   BU YERGA FAQAT PUBLISHABLE KEY QO'YILADI.
-   SECRET / SERVICE_ROLE KEY QO'YILMAYDI.
+  BU YERGA O'ZINGDAGI SUPABASE PUBLISHABLE KEYNI QO'Y
 */
-
 const SUPABASE_KEY =
-"YOUR_PUBLISHABLE_KEY";
+    "YOUR_PUBLISHABLE_KEY_HERE";
 
 
-const db =
-supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
+/* =========================
+   ADMIN PAROL
+========================= */
 
-
-/* =====================================================
-   ADMIN
-===================================================== */
-
+/*
+  BU YERGA O'ZING ISHLATADIGAN ADMIN PAROLNI YOZ
+*/
 const ADMIN_PASSWORD =
-"1983 xushnutbek";
+    "YOUR_ADMIN_PASSWORD_HERE";
 
 
-let products = [];
+/* =========================
+   MAHSULOTLAR
+========================= */
 
-let selectedProduct = null;
+let products = [
 
+    {
+        id:"local-1",
+        name:"BROM 220W",
+        price:111,
+        description:"220W quvvatli zamonaviy qurilma.",
+        image:"brom.jpg",
+        category:"BROM",
+        stock:10,
+        icon:"⚡"
+    },
 
-/* =====================================================
-   DEFAULT PRODUCTS
-===================================================== */
+    {
+        id:"local-2",
+        name:"BROM PRO",
+        price:799000,
+        description:"Kuchli va tez ishlaydigan professional model.",
+        image:"",
+        category:"BROM",
+        stock:10,
+        icon:"🔥"
+    },
 
-const defaultProducts = [
+    {
+        id:"local-3",
+        name:"BROM MAX",
+        price:999000,
+        description:"Yuqori quvvatli yangi avlod model.",
+        image:"",
+        category:"BROM",
+        stock:10,
+        icon:"🚀"
+    },
 
-{
-id:"demo-1",
-name:"BROM 220W",
-price:111,
-category:"BROM",
-image:"",
-description:"220W quvvatli zamonaviy qurilma."
-},
+    {
+        id:"local-4",
+        name:"BROM ULTRA",
+        price:1299000,
+        description:"Premium darajadagi kuchli model.",
+        image:"",
+        category:"BROM",
+        stock:10,
+        icon:"💎"
+    },
 
-{
-id:"demo-2",
-name:"BROM PRO",
-price:799000,
-category:"BROM",
-image:"",
-description:"Professional darajadagi zamonaviy qurilma."
-},
+    {
+        id:"local-5",
+        name:"BROM MINI",
+        price:299000,
+        description:"Kichik, qulay va olib yurishga oson.",
+        image:"",
+        category:"BROM",
+        stock:10,
+        icon:"📱"
+    },
 
-{
-id:"demo-3",
-name:"BROM MAX",
-price:999000,
-category:"BROM",
-image:"",
-description:"Yuqori quvvatli BROM qurilmasi."
-},
+    {
+        id:"local-6",
+        name:"BROM POWER",
+        price:599000,
+        description:"Kuchli batareya va uzoq ishlash.",
+        image:"",
+        category:"BROM",
+        stock:10,
+        icon:"🔋"
+    },
 
-{
-id:"demo-4",
-name:"BROM ULTRA",
-price:1299000,
-category:"BROM",
-image:"",
-description:"Premium BROM mahsuloti."
-},
+    {
+        id:"local-7",
+        name:"BROM FAST",
+        price:699000,
+        description:"Tezkor ishlash uchun yaratilgan.",
+        image:"",
+        category:"BROM",
+        stock:10,
+        icon:"⚡"
+    },
 
-{
-id:"demo-5",
-name:"BROM MINI",
-price:299000,
-category:"BROM",
-image:"",
-description:"Ixcham va qulay model."
-},
+    {
+        id:"local-8",
+        name:"BROM SMART",
+        price:899000,
+        description:"Smart texnologiyali zamonaviy model.",
+        image:"",
+        category:"BROM",
+        stock:10,
+        icon:"🤖"
+    },
 
-{
-id:"demo-6",
-name:"BROM POWER",
-price:599000,
-category:"BROM",
-image:"",
-description:"Kuchli va ishonchli model."
-},
+    {
+        id:"local-9",
+        name:"BROM X",
+        price:1099000,
+        description:"Yangi dizayn va kuchli imkoniyatlar.",
+        image:"",
+        category:"BROM",
+        stock:10,
+        icon:"🛸"
+    },
 
-{
-id:"demo-7",
-name:"BROM FAST",
-price:699000,
-category:"BROM",
-image:"",
-description:"Tezkor ishlash uchun."
-},
+    {
+        id:"local-10",
+        name:"BROM X PRO",
+        price:1499000,
+        description:"Professional foydalanish uchun.",
+        image:"",
+        category:"BROM",
+        stock:10,
+        icon:"💠"
+    },
 
-{
-id:"demo-8",
-name:"BROM SMART",
-price:899000,
-category:"BROM",
-image:"",
-description:"Aqlli zamonaviy model."
-},
+    {
+        id:"local-11",
+        name:"BROM TURBO",
+        price:1199000,
+        description:"Turbo tezlikdagi kuchli model.",
+        image:"",
+        category:"BROM",
+        stock:10,
+        icon:"🏎️"
+    },
 
-{
-id:"demo-9",
-name:"BROM X",
-price:1099000,
-category:"BROM",
-image:"",
-description:"Yangi avlod BROM X."
-},
-
-{
-id:"demo-10",
-name:"BROM X PRO",
-price:1499000,
-category:"BROM",
-image:"",
-description:"Professional X PRO modeli."
-},
-
-{
-id:"demo-11",
-name:"BROM TURBO",
-price:1199000,
-category:"BROM",
-image:"",
-description:"Turbo darajadagi kuchli model."
-},
-
-{
-id:"demo-12",
-name:"BROM PREMIUM",
-price:1799000,
-category:"BROM",
-image:"",
-description:"Premium toifadagi mahsulot."
-}
+    {
+        id:"local-12",
+        name:"BROM PREMIUM",
+        price:1799000,
+        description:"Premium sifat va zamonaviy dizayn.",
+        image:"",
+        category:"BROM",
+        stock:10,
+        icon:"👑"
+    }
 
 ];
 
+let editingProductId = null;
+let selectedProduct = null;
 
-/* =====================================================
-   HELPERS
-===================================================== */
 
-function escapeHtml(text){
+/* =========================
+   PUL
+========================= */
 
-return String(text ?? "")
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
+function money(number){
+    return Number(number).toLocaleString("uz-UZ") + " so'm";
 }
 
 
-function money(value){
+/* =========================
+   SUPABASE REQUEST
+========================= */
 
-return Number(value || 0)
-.toLocaleString("uz-UZ")
-+" so'm";
+async function supabaseRequest(
+    path,
+    options={}
+){
 
+    if(
+        !SUPABASE_KEY ||
+        SUPABASE_KEY === "YOUR_PUBLISHABLE_KEY_HERE"
+    ){
+        return null;
+    }
+
+    try{
+
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/" +
+                path,
+                {
+                    ...options,
+
+                    headers:{
+                        "apikey":SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY,
+
+                        "Content-Type":
+                            "application/json",
+
+                        ...(options.headers || {})
+                    }
+                }
+            );
+
+        if(!response.ok){
+
+            console.error(
+                "Supabase error:",
+                await response.text()
+            );
+
+            return null;
+        }
+
+        const text =
+            await response.text();
+
+        return text
+            ? JSON.parse(text)
+            : true;
+
+    }catch(error){
+
+        console.error(error);
+
+        return null;
+    }
 }
 
 
-function toast(message){
-
-const el =
-document.getElementById("toast");
-
-el.textContent = message;
-
-el.classList.add("show");
-
-setTimeout(()=>{
-el.classList.remove("show");
-},3000);
-
-}
-
-
-/* =====================================================
-   LOAD
-===================================================== */
+/* =========================
+   MAHSULOTLARNI YUKLASH
+========================= */
 
 async function loadProducts(){
 
-try{
+    const data =
+        await supabaseRequest(
+            "products?select=*&order=created_at.asc"
+        );
 
-const result =
-await db
-.from("products")
-.select("*")
-.order("created_at",{ascending:false});
+    if(
+        Array.isArray(data) &&
+        data.length > 0
+    ){
 
+        products =
+            data.map(item => ({
 
-if(result.error){
+                id:item.id,
 
-console.log(
-"Supabase:",
-result.error
-);
+                name:item.name || "",
 
-products =
-loadLocalProducts();
+                price:Number(item.price) || 0,
 
-}else{
+                description:
+                    item.description || "",
 
-products =
-result.data || [];
+                image:item.image || "",
 
-if(products.length === 0){
+                category:
+                    item.category || "BROM",
 
-products =
-loadLocalProducts();
+                stock:
+                    Number(item.stock) || 0,
 
-}
+                icon:"📦"
 
-}
+            }));
 
-}catch(error){
+    }
 
-console.log(error);
-
-products =
-loadLocalProducts();
-
-}
-
-render();
-
+    showProducts();
+    showAdminProducts();
 }
 
 
-function loadLocalProducts(){
+/* =========================
+   MAHSULOTLARNI CHIQARISH
+========================= */
 
-const saved =
-localStorage.getItem(
-"brom_products"
-);
+function showProducts(){
 
-if(saved){
+    const grid =
+        document.getElementById("productGrid");
 
-try{
+    const search =
+        document
+        .getElementById("search")
+        .value
+        .toLowerCase()
+        .trim();
 
-return JSON.parse(saved);
+    const filtered =
+        products.filter(product =>
+            product.name
+                .toLowerCase()
+                .includes(search)
+        );
 
-}catch(e){}
+    grid.innerHTML = "";
 
-}
+    if(filtered.length === 0){
 
-return defaultProducts;
+        grid.innerHTML =
+            `<div class="empty">
+                Mahsulot topilmadi.
+            </div>`;
 
-}
+        return;
+    }
 
+    filtered.forEach(product => {
 
-function saveLocalProducts(){
+        let imageHTML = "";
 
-localStorage.setItem(
-"brom_products",
-JSON.stringify(products)
-);
+        if(product.image){
 
-}
+            imageHTML = `
+                <img
+                    src="${escapeHTML(product.image)}"
+                    onerror="
+                        this.style.display='none';
+                        this.nextElementSibling.style.display='block';
+                    "
+                >
 
+                <div
+                    class="product-icon"
+                    style="display:none;">
+                    ${product.icon || "📦"}
+                </div>
+            `;
 
-/* =====================================================
-   RENDER
-===================================================== */
+        }else{
 
-function render(){
+            imageHTML = `
+                <div class="product-icon">
+                    ${product.icon || "📦"}
+                </div>
+            `;
+        }
 
-const list =
-document.getElementById(
-"productList"
-);
+        grid.innerHTML += `
 
-const admin =
-document.getElementById(
-"adminList"
-);
+            <div class="card">
 
+                <div class="product-image">
+                    ${imageHTML}
+                </div>
 
-if(products.length===0){
+                <div class="card-info">
 
-list.innerHTML=`
-<div class="empty">
-📦<br><br>
-Hozircha mahsulot yo‘q.
-</div>
-`;
+                    <h3>
+                        ${escapeHTML(product.name)}
+                    </h3>
 
-}else{
+                    <div class="description">
+                        ${escapeHTML(product.description)}
+                    </div>
 
-list.innerHTML =
-products.map(product=>{
+                    <div class="price">
+                        ${money(product.price)}
+                    </div>
 
-return `
+                    <button
+                        class="buy-btn"
+                        onclick="openBuy('${product.id}')">
+                        SOTIB OLISH
+                    </button>
 
-<div class="card">
+                </div>
 
-<div class="card-image">
-
-${
-product.image
-?
-`
-<img
-src="${escapeHtml(product.image)}"
-onerror="this.style.display='none'">
-`
-:
-`
-<div class="no-image">📦</div>
-`
-}
-
-</div>
-
-<div class="card-body">
-
-<div class="category">
-${escapeHtml(product.category || "BROM")}
-</div>
-
-<div class="name">
-${escapeHtml(product.name)}
-</div>
-
-<div class="description">
-${escapeHtml(
-product.description ||
-"Sifatli zamonaviy mahsulot."
-)}
-</div>
-
-<div class="bottom">
-
-<div class="price">
-${money(product.price)}
-</div>
-
-<button
-class="buy"
-onclick="openOrder('${product.id}')">
-BUYURTMA
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-`;
-
-}).join("");
-
+            </div>
+        `;
+    });
 }
 
 
-admin.innerHTML =
-products.map(product=>{
+/* =========================
+   BUY
+========================= */
 
-return `
+function openBuy(id){
 
-<div class="admin-item">
+    selectedProduct =
+        products.find(
+            product =>
+            String(product.id) === String(id)
+        );
 
-${
-product.image
-?
-`
-<img
-class="admin-img"
-src="${escapeHtml(product.image)}">
-`
-:
-`
-<div class="admin-img"
-style="
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:25px">
-📦
-</div>
-`
-}
+    if(!selectedProduct) return;
 
-<div class="admin-info">
+    document.getElementById(
+        "modalProduct"
+    ).textContent =
+        selectedProduct.name +
+        " — " +
+        money(selectedProduct.price);
 
-<div class="admin-name">
-${escapeHtml(product.name)}
-</div>
-
-<div class="admin-price">
-${money(product.price)}
-</div>
-
-</div>
-
-<button
-class="delete"
-onclick="deleteProduct('${product.id}')">
-🗑️
-</button>
-
-</div>
-
-`;
-
-}).join("");
-
+    document.getElementById(
+        "buyModal"
+    ).style.display = "flex";
 }
 
 
-/* =====================================================
-   ADD PRODUCT
-===================================================== */
-
-async function addProduct(){
-
-const name =
-document.getElementById("name")
-.value.trim();
-
-const price =
-document.getElementById("price")
-.value;
-
-const category =
-document.getElementById("category")
-.value.trim();
-
-const image =
-document.getElementById("image")
-.value.trim();
-
-const description =
-document.getElementById("description")
-.value.trim();
-
-const error =
-document.getElementById("productError");
-
-
-error.classList.remove("show");
-
-
-if(!name){
-
-error.textContent =
-"Mahsulot nomini kiriting.";
-
-error.classList.add("show");
-
-return;
-
-}
-
-
-if(price === ""){
-
-error.textContent =
-"Narxni kiriting.";
-
-error.classList.add("show");
-
-return;
-
-}
-
-
-const button =
-document.querySelector(".add-btn");
-
-button.disabled=true;
-
-button.textContent=
-"SAQLANMOQDA...";
-
-
-try{
-
-const result =
-await db
-.from("products")
-.insert({
-
-name:name,
-
-price:Number(price),
-
-image:image,
-
-description:description,
-
-category:
-category || "BROM",
-
-stock:0
-
-})
-.select()
-.single();
-
-
-if(result.error){
-
-throw result.error;
-
-}
-
-
-products.unshift(
-result.data
-);
-
-
-saveLocalProducts();
-
-render();
-
-clearForm();
-
-toast(
-"Mahsulot qo‘shildi!"
-);
-
-
-}catch(error){
-
-console.log(error);
-
-
-/*
-   Agar Supabase INSERT policy hali tayyor bo'lmasa,
-   mahsulot baribir shu brauzerda ishlashi uchun
-   localStorage'ga saqlanadi.
-*/
-
-const localProduct={
-
-id:
-"local-"+Date.now(),
-
-name:name,
-
-price:Number(price),
-
-image:image,
-
-description:description,
-
-category:
-category || "BROM",
-
-stock:0
-
-};
-
-
-products.unshift(
-localProduct
-);
-
-saveLocalProducts();
-
-render();
-
-clearForm();
-
-toast(
-"Mahsulot qo‘shildi!"
-);
-
-}finally{
-
-button.disabled=false;
-
-button.textContent=
-"➕ MAHSULOT QO‘SHISH";
-
-}
-
-}
-
-
-/* =====================================================
-   CLEAR FORM
-===================================================== */
-
-function clearForm(){
-
-document.getElementById("name").value="";
-document.getElementById("price").value="";
-document.getElementById("category").value="";
-document.getElementById("image").value="";
-document.getElementById("description").value="";
-
-}
-
-
-/* =====================================================
-   DELETE
-===================================================== */
-
-async function deleteProduct(id){
-
-const product =
-products.find(
-p=>String(p.id)===String(id)
-);
-
-if(!product)return;
-
-
-if(!confirm(
-`"${product.name}" ni o‘chirish kerakmi?`
-))return;
-
-
-try{
-
-if(
-!String(id).startsWith("demo-")
-&&
-!String(id).startsWith("local-")
-){
-
-const result =
-await db
-.from("products")
-.delete()
-.eq("id",id);
-
-if(result.error){
-
-throw result.error;
-
-}
-
-}
-
-}catch(error){
-
-console.log(error);
-
-}
-
-
-products =
-products.filter(
-p=>String(p.id)!==String(id)
-);
-
-
-saveLocalProducts();
-
-render();
-
-toast(
-"Mahsulot o‘chirildi."
-);
-
-}
-
-
-/* =====================================================
-   ADMIN
-===================================================== */
-
-function openAdmin(){
-
-document
-.getElementById("adminModal")
-.classList.add("show");
-
-
-const logged =
-sessionStorage.getItem(
-"brom_admin"
-);
-
-
-if(logged==="true"){
-
-document
-.getElementById("loginPanel")
-.style.display="none";
-
-document
-.getElementById("adminPanel")
-.classList.add("show");
-
-}else{
-
-document
-.getElementById("loginPanel")
-.style.display="block";
-
-document
-.getElementById("adminPanel")
-.classList.remove("show");
-
-}
-
-}
-
-
-function closeAdmin(){
-
-document
-.getElementById("adminModal")
-.classList.remove("show");
-
-}
-
-
-function login(){
-
-const password =
-document
-.getElementById("adminPassword")
-.value;
-
-
-const error =
-document
-.getElementById("loginError");
-
-
-if(password===ADMIN_PASSWORD){
-
-sessionStorage.setItem(
-"brom_admin",
-"true"
-);
-
-error.classList.remove("show");
-
-document
-.getElementById("loginPanel")
-.style.display="none";
-
-document
-.getElementById("adminPanel")
-.classList.add("show");
-
-document
-.getElementById("adminPassword")
-.value="";
-
-toast(
-"Admin panel ochildi!"
-);
-
-}else{
-
-error.classList.add("show");
-
-}
-
-}
-
-
-function logout(){
-
-sessionStorage.removeItem(
-"brom_admin"
-);
-
-document
-.getElementById("adminPanel")
-.classList.remove("show");
-
-document
-.getElementById("loginPanel")
-.style.display="block";
-
-toast(
-"Admin panel yopildi."
-);
-
-}
-
-
-/* =====================================================
-   ORDER
-===================================================== */
-
-function openOrder(id){
-
-selectedProduct =
-products.find(
-p=>String(p.id)===String(id)
-);
-
-if(!selectedProduct)return;
-
-
-document
-.getElementById("orderProduct")
-.innerHTML=`
-
-<strong>
-${escapeHtml(selectedProduct.name)}
-</strong>
-
-<div style="
-color:#888;
-margin-top:7px">
-${money(selectedProduct.price)}
-</div>
-
-`;
-
-
-document
-.getElementById("orderModal")
-.classList.add("show");
-
-}
-
-
-function closeOrder(){
-
-document
-.getElementById("orderModal")
-.classList.remove("show");
-
-}
-
+/* =========================
+   BUYURTMA
+========================= */
 
 function sendOrder(){
 
-if(!selectedProduct)return;
+    const name =
+        document
+        .getElementById("buyerName")
+        .value
+        .trim();
+
+    const phone =
+        document
+        .getElementById("buyerPhone")
+        .value
+        .trim();
+
+    if(!name || !phone){
+
+        alert(
+            "Iltimos, ism va telefon raqamingizni kiriting!"
+        );
+
+        return;
+    }
+
+    const orders =
+        JSON.parse(
+            localStorage.getItem(
+                "bromOrders"
+            ) || "[]"
+        );
+
+    orders.push({
+
+        id:Date.now(),
+
+        name:name,
+
+        phone:phone,
+
+        product:
+            selectedProduct.name,
+
+        price:
+            selectedProduct.price,
+
+        time:
+            new Date()
+            .toLocaleString("uz-UZ")
+
+    });
+
+    localStorage.setItem(
+        "bromOrders",
+        JSON.stringify(orders)
+    );
+
+    document.getElementById(
+        "buyerName"
+    ).value = "";
+
+    document.getElementById(
+        "buyerPhone"
+    ).value = "";
+
+    closeModal("buyModal");
+
+    document.getElementById(
+        "successModal"
+    ).style.display = "flex";
+
+    updateAdmin();
+}
 
 
-const name =
-document
-.getElementById("customerName")
-.value.trim();
+/* =========================
+   ADMIN LOGIN
+========================= */
 
-const phone =
-document
-.getElementById("customerPhone")
-.value.trim();
+function openAdminLogin(){
 
-const comment =
-document
-.getElementById("customerComment")
-.value.trim();
+    document.getElementById(
+        "adminLogin"
+    ).style.display = "flex";
+
+}
+
+function loginAdmin(){
+
+    const password =
+        document
+        .getElementById("adminPassword")
+        .value;
+
+    if(
+        password === ADMIN_PASSWORD &&
+        ADMIN_PASSWORD !==
+        "YOUR_ADMIN_PASSWORD_HERE"
+    ){
+
+        closeModal("adminLogin");
+
+        document.getElementById(
+            "adminPanel"
+        ).style.display = "block";
+
+        updateAdmin();
+
+        showAdminProducts();
+
+        document.getElementById(
+            "adminPanel"
+        ).scrollIntoView();
+
+    }else{
+
+        alert(
+            "Admin parol noto‘g‘ri!"
+        );
+
+    }
+}
 
 
-if(!name){
+/* =========================
+   ADMIN PRODUCT LIST
+========================= */
 
-toast("Ismingizni kiriting.");
+function showAdminProducts(){
 
-return;
+    const container =
+        document.getElementById(
+            "adminProducts"
+        );
+
+    if(!container) return;
+
+    if(products.length === 0){
+
+        container.innerHTML =
+            `<div class="empty">
+                Hozircha mahsulot yo‘q.
+            </div>`;
+
+        return;
+    }
+
+    container.innerHTML = "";
+
+    products.forEach(product => {
+
+        container.innerHTML += `
+
+            <div class="admin-product">
+
+                <div class="admin-product-info">
+
+                    <b>
+                        ${escapeHTML(product.name)}
+                    </b>
+
+                    <br>
+
+                    <span style="color:#aaa;">
+                        ${money(product.price)}
+                    </span>
+
+                    <br>
+
+                    <span style="color:#666;">
+                        Ombor: ${product.stock ?? 0} dona
+                    </span>
+
+                </div>
+
+                <div class="admin-product-buttons">
+
+                    <button
+                        class="edit-btn"
+                        onclick="editProduct('${product.id}')">
+                        ✏️
+                    </button>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteProduct('${product.id}')">
+                        🗑️
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+    });
+}
+
+
+/* =========================
+   PRODUCT FORM
+========================= */
+
+function openProductForm(){
+
+    editingProductId = null;
+
+    document.getElementById(
+        "productModalTitle"
+    ).textContent =
+        "➕ Mahsulot qo‘shish";
+
+    document.getElementById(
+        "productName"
+    ).value = "";
+
+    document.getElementById(
+        "productPrice"
+    ).value = "";
+
+    document.getElementById(
+        "productImage"
+    ).value = "";
+
+    document.getElementById(
+        "productDescription"
+    ).value = "";
+
+    document.getElementById(
+        "productCategory"
+    ).value = "BROM";
+
+    document.getElementById(
+        "productStock"
+    ).value = "10";
+
+    document.getElementById(
+        "productModal"
+    ).style.display = "flex";
+}
+
+
+/* =========================
+   EDIT PRODUCT
+========================= */
+
+function editProduct(id){
+
+    const product =
+        products.find(
+            item =>
+            String(item.id) === String(id)
+        );
+
+    if(!product) return;
+
+    editingProductId =
+        product.id;
+
+    document.getElementById(
+        "productModalTitle"
+    ).textContent =
+        "✏️ Mahsulotni o‘zgartirish";
+
+    document.getElementById(
+        "productName"
+    ).value =
+        product.name || "";
+
+    document.getElementById(
+        "productPrice"
+    ).value =
+        product.price || 0;
+
+    document.getElementById(
+        "productImage"
+    ).value =
+        product.image || "";
+
+    document.getElementById(
+        "productDescription"
+    ).value =
+        product.description || "";
+
+    document.getElementById(
+        "productCategory"
+    ).value =
+        product.category || "BROM";
+
+    document.getElementById(
+        "productStock"
+    ).value =
+        product.stock || 0;
+
+    document.getElementById(
+        "productModal"
+    ).style.display = "flex";
+}
+
+
+/* =========================
+   SAVE PRODUCT
+========================= */
+
+async function saveProduct(){
+
+    const name =
+        document
+        .getElementById("productName")
+        .value
+        .trim();
+
+    const price =
+        Number(
+            document
+            .getElementById("productPrice")
+            .value
+        );
+
+    const image =
+        document
+        .getElementById("productImage")
+        .value
+        .trim();
+
+    const description =
+        document
+        .getElementById("productDescription")
+        .value
+        .trim();
+
+    const category =
+        document
+        .getElementById("productCategory")
+        .value
+        .trim();
+
+    const stock =
+        Number(
+            document
+            .getElementById("productStock")
+            .value
+        );
+
+    if(!name){
+
+        alert("Mahsulot nomini kiriting!");
+
+        return;
+    }
+
+    if(!price || price < 0){
+
+        alert("Mahsulot narxini kiriting!");
+
+        return;
+    }
+
+    const productData = {
+
+        name:name,
+
+        price:price,
+
+        image:image,
+
+        description:description,
+
+        category:
+            category || "BROM",
+
+        stock:
+            stock >= 0 ? stock : 0
+
+    };
+
+
+    /* YANGI */
+
+    if(!editingProductId){
+
+        const data =
+            await supabaseRequest(
+                "products",
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Prefer":
+                            "return=representation"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            productData
+                        )
+                }
+            );
+
+        if(Array.isArray(data) && data[0]){
+
+            products.push({
+
+                id:data[0].id,
+
+                name:
+                    data[0].name,
+
+                price:
+                    Number(data[0].price),
+
+                image:
+                    data[0].image || "",
+
+                description:
+                    data[0].description || "",
+
+                category:
+                    data[0].category || "BROM",
+
+                stock:
+                    Number(data[0].stock) || 0,
+
+                icon:"📦"
+
+            });
+
+        }else{
+
+            products.push({
+
+                id:
+                    "local-" +
+                    Date.now(),
+
+                ...productData,
+
+                icon:"📦"
+
+            });
+
+        }
+
+        alert(
+            "Mahsulot muvaffaqiyatli qo‘shildi!"
+        );
+
+    }
+
+    /* O'ZGARTIRISH */
+
+    else{
+
+        const data =
+            await supabaseRequest(
+                "products?id=eq." +
+                encodeURIComponent(
+                    editingProductId
+                ),
+                {
+                    method:"PATCH",
+
+                    headers:{
+                        "Prefer":
+                            "return=representation"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            productData
+                        )
+                }
+            );
+
+        const index =
+            products.findIndex(
+                item =>
+                String(item.id) ===
+                String(editingProductId)
+            );
+
+        if(index !== -1){
+
+            products[index] = {
+
+                ...products[index],
+
+                ...productData
+
+            };
+
+        }
+
+        alert(
+            "Mahsulot muvaffaqiyatli o‘zgartirildi!"
+        );
+    }
+
+    closeModal("productModal");
+
+    showProducts();
+
+    showAdminProducts();
 
 }
 
 
-if(!phone){
+/* =========================
+   DELETE PRODUCT
+========================= */
 
-toast("Telefon raqamingizni kiriting.");
+async function deleteProduct(id){
 
-return;
+    const product =
+        products.find(
+            item =>
+            String(item.id) === String(id)
+        );
 
+    if(!product) return;
+
+    const ok =
+        confirm(
+            `"${product.name}" mahsulotini o‘chirishni xohlaysizmi?`
+        );
+
+    if(!ok) return;
+
+
+    if(
+        String(id).indexOf("local-") !== 0
+    ){
+
+        await supabaseRequest(
+            "products?id=eq." +
+            encodeURIComponent(id),
+            {
+                method:"DELETE"
+            }
+        );
+
+    }
+
+    products =
+        products.filter(
+            item =>
+            String(item.id) !== String(id)
+        );
+
+    showProducts();
+
+    showAdminProducts();
+
+    alert(
+        "Mahsulot o‘chirildi!"
+    );
 }
 
 
-const text =
-encodeURIComponent(
+/* =========================
+   ADMIN ORDERS
+========================= */
 
-`🛒 YANGI BUYURTMA
+function updateAdmin(){
 
-📦 Mahsulot:
-${selectedProduct.name}
+    const orders =
+        JSON.parse(
+            localStorage.getItem(
+                "bromOrders"
+            ) || "[]"
+        );
 
-💰 Narx:
-${money(selectedProduct.price)}
+    document.getElementById(
+        "adminCount"
+    ).textContent =
+        orders.length;
 
-👤 Mijoz:
-${name}
+    const totalSales =
+        orders.reduce(
+            (sum,order) =>
+            sum +
+            Number(order.price || 0),
+            0
+        );
 
-📞 Telefon:
-${phone}
+    document.getElementById(
+        "adminMoney"
+    ).textContent =
+        money(totalSales);
 
-💬 Izoh:
-${comment || "Yo‘q"}`
+    const container =
+        document.getElementById(
+            "orders"
+        );
 
-);
+    if(orders.length === 0){
 
+        container.innerHTML = `
+            <div class="order">
+                Hozircha buyurtmalar yo‘q.
+            </div>
+        `;
 
-closeOrder();
+        return;
+    }
 
+    container.innerHTML = "";
 
-window.open(
-"https://t.me/amirhonsh?text="+text,
-"_blank"
-);
+    [...orders]
+    .reverse()
+    .forEach(order => {
 
+        container.innerHTML += `
 
-toast(
-"Buyurtma tayyorlandi!"
-);
+            <div class="order">
 
+                <p>
+                    👤 Ism:
+                    <b>
+                        ${escapeHTML(order.name)}
+                    </b>
+                </p>
+
+                <p>
+                    📞 Telefon:
+                    <b>
+                        ${escapeHTML(order.phone)}
+                    </b>
+                </p>
+
+                <p>
+                    🛒 Mahsulot:
+                    <b>
+                        ${escapeHTML(order.product)}
+                    </b>
+                </p>
+
+                <p>
+                    💰 Narx:
+                    <b>
+                        ${money(order.price)}
+                    </b>
+                </p>
+
+                <p>
+                    🕐 Vaqt:
+                    ${escapeHTML(order.time)}
+                </p>
+
+            </div>
+        `;
+    });
 }
 
 
-/* =====================================================
-   INIT
-===================================================== */
+/* =========================
+   CLEAR ORDERS
+========================= */
 
-document.addEventListener(
-"DOMContentLoaded",
-()=>{
+function clearOrders(){
+
+    if(
+        confirm(
+            "Barcha buyurtmalar o‘chirilsinmi?"
+        )
+    ){
+
+        localStorage.removeItem(
+            "bromOrders"
+        );
+
+        updateAdmin();
+    }
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+function closeModal(id){
+
+    document.getElementById(id)
+        .style.display = "none";
+}
+
+
+/* =========================
+   HTML XAVFSIZLIGI
+========================= */
+
+function escapeHTML(value){
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+
+/* =========================
+   START
+========================= */
+
+showProducts();
 
 loadProducts();
-
-}
-);
 
 </script>
 
 </body>
-</html>
+</html>  
