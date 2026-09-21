@@ -1675,8 +1675,8 @@ async function deleteProduct(id){
         if(!response.ok){
 
             throw new Error(
-                "Delete failed"
-            );
+    "Supabase xatosi: " + response.status + " — " + await response.text()
+);
 
         }
 
