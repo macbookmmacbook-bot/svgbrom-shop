@@ -76,7 +76,8 @@ Index · HTML
   .drawer-head{padding:18px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;}
   .drawer-body{flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:14px;}
   .cart-item{display:flex; gap:12px; align-items:center; border-bottom:1px solid var(--line); padding-bottom:12px;}
-  .cart-item .em{font-size:30px; width:46px; text-align:center;}
+  .cart-item .em{font-size:30px; width:46px; text-align:center; flex-shrink:0;}
+  .cart-item .em img{width:46px; height:46px; object-fit:cover; border-radius:8px;}
   .cart-item .info{flex:1;}
   .cart-item .info b{font-size:14px;}
   .cart-item .info .p{color:var(--gold); font-size:13px; font-weight:700;}
@@ -124,6 +125,8 @@ Index · HTML
     .hero p{margin-left:auto; margin-right:auto;}
     .hero-visual{order:-1; height:220px;}
     .nav-links{display:none;}
+    .seller-cta{display:none;}
+    .seller-icon{display:flex !important;}
     .stats{grid-template-columns:1fr;}
     table{font-size:12px;}
     th,td{padding:9px 8px;}
@@ -142,7 +145,8 @@ Index · HTML
       <a href="#" onclick="openAdmin()">Admin</a>
     </div>
     <div class="nav-right">
-      <a class="btn ghost" href="#" onclick="openSeller()" style="padding:9px 16px; font-size:13px;">🏪 Sotuvchi bo'ling</a>
+      <a class="btn ghost seller-cta" href="#" onclick="openSeller()" style="padding:9px 16px; font-size:13px;">🏪 Sotuvchi bo'ling</a>
+      <div class="icon-btn seller-icon" onclick="openSeller()" title="Sotuvchi bo'ling" style="display:none;">🏪</div>
       <div class="icon-btn" onclick="openAdmin()" title="Admin panel">⚙️</div>
       <div class="icon-btn" onclick="openCart()" title="Savat">
         🛒<span class="badge" id="cartBadge">0</span>
@@ -201,7 +205,7 @@ Index · HTML
     <div class="em">🔐</div>
     <h3>Admin panel</h3>
     <p style="color:var(--muted); font-size:13px; margin:8px 0 18px;">Kirish uchun parolni kiriting</p>
-    <div class="field"><input type="password" id="adminPass" placeholder="Parol"></div>
+    <div class="field"><input type="password" id="adminPass" placeholder="Parol" onkeydown="if(event.key==='Enter') adminLogin()"></div>
     <button class="btn" style="width:100%; justify-content:center" onclick="adminLogin()">Kirish</button>
     <p style="margin-top:14px; font-size:12px; color:var(--muted)">Demo parol: <b>brom2026</b></p>
   </div>
@@ -257,7 +261,7 @@ Index · HTML
 const PRODUCTS = [
   // img — ixtiyoriy: internetdagi rasm havolasi. Bo'lmasa, em (emoji) ko'rsatiladi.
   // Masalan: {id:1, name:"...", cat:"...", price:249000, em:"🎧", img:"https://i.imgur.com/misol.jpg", desc:"..."},
-  {id:1,name:"Wireless quloqchin",cat:"Elektronika",price:249000,em:"🎧",desc:"https://frankfurt.apollo.olxcdn.com/v1/files/4xzx3lemx92p2-UZ/image"Bluetooth 5.3, 30 soat batareya"},
+  {id:1,name:"Wireless quloqchin",cat:"Elektronika",price:249000,em:"🎧",desc:"Bluetooth 5.3, 30 soat batareya"},
   {id:2,name:"Smart soat",cat:"Elektronika",price:389000,em:"⌚",desc:"Puls, uyqu monitoring, suv o'tkazmas"},
   {id:3,name:"Erkaklar krossovkasi",cat:"Kiyim",price:329000,em:"👟",desc:"Yengil, nafas oluvchi material"},
   {id:4,name:"Ayollar sumkasi",cat:"Aksessuar",price:279000,em:"👜",desc:"Tabiiy teri, zamonaviy dizayn"},
@@ -372,7 +376,7 @@ function updateCartUI(){
   body.innerHTML = entries.map(([id,qty])=>{
     const p = PRODUCTS.find(p=>p.id==id);
     return `<div class="cart-item">
-      <div class="em">${p.em}</div>
+      <div class="em">${p.img ? `<img src="${p.img}" alt="${p.name}" onerror="this.parentElement.textContent='${p.em}'">` : p.em}</div>
       <div class="info">
         <b>${p.name}</b><br>
         <span class="p">${fmt(p.price)} so'm</span>
@@ -431,7 +435,7 @@ function submitOrder(){
   };
   orders.unshift(order);
   cart = {};
-  updateCartUI();  
+  updateCartUI();
   renderAdmin();
   sendTelegramOrder(order);
   document.getElementById('checkoutBox').innerHTML = `
@@ -509,8 +513,7 @@ function openSeller(){
   document.getElementById('sellerView').style.display='block';
   document.getElementById('sellerFormBox').style.display='block';
   document.getElementById('sellerSuccessBox').style.display='none';
-  if(sellerProductCount===0) addSellerProductField();
-}
+  if(sellerProductCount===0) addSellerProductField();}
 async function submitSellerRequest(){
   const name = document.getElementById('selName').value.trim();
   const phone = document.getElementById('selPhone').value.trim();
@@ -547,6 +550,14 @@ ${productsText}
  
   document.getElementById('sellerFormBox').style.display='none';
   document.getElementById('sellerSuccessBox').style.display='block';
+  resetSellerForm();
+}
+function resetSellerForm(){
+  document.getElementById('selName').value='';
+  document.getElementById('selPhone').value='';
+  document.getElementById('sellerProducts').innerHTML='';
+  sellerProductCount=0;
+  addSellerProductField();
 }
  
 /* ---------- VIEW SWITCH ---------- */
