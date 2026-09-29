@@ -431,7 +431,7 @@ function submitOrder(){
   };
   orders.unshift(order);
   cart = {};
-  updateCartUI();
+  updateCartUI();  
   renderAdmin();
   sendTelegramOrder(order);
   document.getElementById('checkoutBox').innerHTML = `
