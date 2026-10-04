@@ -139,7 +139,7 @@
       <a href="#" onclick="showStore()">Katalog</a>
       <a href="#cats">Kategoriyalar</a>
       <a href="#" onclick="openSeller()">Sotuvchi bo'ling</a>
-      <a href="#" onclick="openMyOrders()">Buyurtmalarim</a>
+      <a href="#" onclick="openMyOrders()">👤 Profilim</a>
       <a href="#" onclick="openAdmin()">Admin</a>
     </div>
     <div class="nav-right">
@@ -202,9 +202,9 @@
   </div>
 </section>
 
-<section id="myOrdersView" style="display:none; max-width:560px; margin:0 auto; padding:40px 20px 80px;">
+<section id="myOrdersView" style="display:none; max-width:620px; margin:0 auto; padding:40px 20px 80px;">
   <a class="btn ghost" href="#" onclick="showStore()" style="margin-bottom:20px; display:inline-flex;">← Do'konga qaytish</a>
-  <h2 style="font-size:24px; margin-bottom:6px;">🧾 Buyurtmalarim</h2>
+  <h2 style="font-size:24px; margin-bottom:6px;">👤 Profilim</h2>
   <p style="color:var(--muted); font-size:14px; margin-bottom:22px;">Buyurtma berganda kiritgan telefon va 4 xonali parolingizni yozing.</p>
   <div id="myOrdersLoginBox">
     <div class="field"><label>Telefon raqam</label><input id="moPhone" placeholder="+998 90 123 45 67"></div>
@@ -254,7 +254,9 @@
           <div class="field"><label>Emoji</label><input id="newPEm" placeholder="🪚"></div>
         </div>
         <div class="field"><label>Tavsifi</label><input id="newPDesc" placeholder="Qisqacha tavsif"></div>
-        <div class="field"><label>Rasm havolasi (ixtiyoriy)</label><input id="newPImg" placeholder="https://..."></div>
+        <div class="field"><label>Rasm 1 havolasi (ixtiyoriy)</label><input id="newPImg" placeholder="https://..."></div>
+        <div class="field"><label>Rasm 2 havolasi (ixtiyoriy)</label><input id="newPImg2" placeholder="https://..."></div>
+        <div class="field"><label>Rasm 3 havolasi (ixtiyoriy)</label><input id="newPImg3" placeholder="https://..."></div>
         <button class="btn" style="width:100%; justify-content:center;" onclick="adminAddProduct()">Qo'shish — hammaga darhol ko'rinadi</button>
       </div>
       <div id="productsTableWrap"></div>
@@ -263,7 +265,7 @@
 </section>
 
 <!-- CART DRAWER -->
-<div class="overlay" id="overlay" onclick="closeCart(); closeCheckout();"></div>
+<div class="overlay" id="overlay" onclick="closeCart(); closeCheckout(); closeProductDetail();"></div>
 <div class="drawer" id="cartDrawer">
   <div class="drawer-head">
     <h3>Savat</h3>
@@ -274,6 +276,11 @@
     <div class="total-row"><span>Jami:</span><span id="cartTotal">0 so'm</span></div>
     <button class="btn" style="width:100%; justify-content:center" onclick="openCheckout()">Buyurtma berish</button>
   </div>
+</div>
+
+<!-- MAHSULOT BATAFSIL MODAL -->
+<div class="modal" id="productModal">
+  <div class="modal-box" id="productModalBox" style="max-width:460px;"></div>
 </div>
 
 <!-- CHECKOUT MODAL -->
@@ -369,7 +376,7 @@ function filterCat(c){ activeCat=c; renderCats(); renderGrid(); }
 function renderGrid(){
   const list = activeCat==="Barchasi" ? PRODUCTS : PRODUCTS.filter(p=>p.cat===activeCat);
   document.getElementById('grid').innerHTML = list.map(p=>`
-    <div class="card">
+    <div class="card" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">
       <div class="card-img">${p.img ? `<img src="${p.img}" alt="${p.name}" onerror="this.parentElement.innerHTML='${p.em}'">` : p.em}</div>
       <div class="card-body">
         <div class="card-cat">${p.cat}</div>
@@ -377,7 +384,7 @@ function renderGrid(){
         <div class="card-desc">${p.desc}</div>
         <div class="card-foot">
           <div class="price">${fmt(p.price)} so'm</div>
-          <button class="add-btn" onclick="addToCart(${p.id})">+</button>
+          <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">+</button>
         </div>
       </div>
     </div>
@@ -385,6 +392,46 @@ function renderGrid(){
 }
 
 function fmt(n){ return n.toLocaleString('ru-RU').replace(/,/g,' '); }
+function normalizePhone(p){ return (p||'').replace(/\D/g,''); } // faqat raqamlarni qoldiradi — "+998 90 123-45-67" va "998901234567" bir xil deb hisoblanadi
+
+/* ---------- MAHSULOT BATAFSIL ---------- */
+function openProductDetail(id){
+  const p = PRODUCTS.find(x=>String(x.id)===String(id));
+  if(!p) return;
+  const imgs = (p.images && p.images.length ? p.images : (p.img ? [p.img] : [])).slice(0,3);
+  document.getElementById('productModalBox').innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <span class="card-cat">${p.cat}</span>
+      <div class="icon-btn" style="width:32px; height:32px;" onclick="closeProductDetail()">✕</div>
+    </div>
+    ${imgs.length ? `
+      <div style="height:220px; border-radius:14px; overflow:hidden; background:linear-gradient(160deg,#20242f,#171a22); display:flex; align-items:center; justify-content:center; margin-bottom:10px;">
+        <img id="pdMainImg" src="${imgs[0]}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='${p.em}'; this.parentElement.style.fontSize='64px';">
+      </div>
+      ${imgs.length>1 ? `<div style="display:flex; gap:8px; margin-bottom:16px;">
+        ${imgs.map(src=>`<img src="${src}" onclick="document.getElementById('pdMainImg').src='${src}'" style="width:56px; height:56px; object-fit:cover; border-radius:8px; cursor:pointer; border:1px solid var(--line);">`).join('')}
+      </div>` : ''}
+    ` : `<div style="height:180px; display:flex; align-items:center; justify-content:center; font-size:72px; background:linear-gradient(160deg,#20242f,#171a22); border-radius:14px; margin-bottom:16px;">${p.em}</div>`}
+    <h3 style="font-size:19px; margin-bottom:6px;">${p.name}</h3>
+    <p style="color:var(--muted); font-size:14px; margin-bottom:14px;">${p.desc}</p>
+    <div class="price" style="font-size:22px; margin-bottom:18px;">${fmt(p.price)} so'm</div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="addToCart('${p.id}'); closeProductDetail();">🛒 Savatga</button>
+      <button class="btn" onclick="buyNow('${p.id}')">Sotib olish</button>
+    </div>
+  `;
+  document.getElementById('productModal').classList.add('show');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeProductDetail(){
+  document.getElementById('productModal').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+}
+function buyNow(id){
+  addToCart(id);
+  closeProductDetail();
+  openCheckout();
+}
 
 /* ---------- SAVAT ---------- */
 function addToCart(id){
@@ -473,7 +520,7 @@ function submitOrder(){
   });
   const order = {
     id: 1000+orders.length+1,
-    name, phone, address, pin: pin||"0000",
+    name, phone, phoneNorm: normalizePhone(phone), address, pin: pin||"0000",
     status: "Yangi",
     items, total: cartTotalSum(),
     date: new Date().toLocaleString('uz-UZ')
@@ -488,9 +535,20 @@ function submitOrder(){
     <div class="success-box">
       <div class="em">✅</div>
       <h3>Buyurtma qabul qilindi!</h3>
-      <p>Admin sizning buyurtmangiz haqida xabardor qilindi. Tez orada operatorimiz siz bilan bog'lanadi.</p>
-      <button class="btn" style="width:100%; justify-content:center; margin-top:10px" onclick="closeCheckout()">Yopish</button>
+      <div style="display:inline-flex; align-items:center; gap:6px; background:var(--bg2); border:1px solid var(--line); border-radius:100px; padding:8px 16px; margin:12px 0;">
+        <span style="width:8px; height:8px; border-radius:50%; background:var(--gold); display:inline-block;"></span>
+        <span style="font-size:13px; font-weight:700;">Holat: ⏳ Kutilmoqda</span>
+      </div>
+      <p>Buyurtma raqamingiz: <b style="color:var(--gold)">#${order.id}</b><br>Admin tasdiqlab, tez orada siz bilan bog'lanadi.</p>
+      <button class="btn" style="width:100%; justify-content:center; margin-top:10px;" onclick="closeCheckout(); showMyPurchaseHistory('${phone}','${pin||"0000"}');">🧾 Xaridlarim arxivini ko'rish</button>
+      <button class="btn ghost" style="width:100%; justify-content:center; margin-top:8px;" onclick="closeCheckout()">Yopish</button>
     </div>`;
+}
+function showMyPurchaseHistory(phone, pin){
+  openMyOrders();
+  document.getElementById('moPhone').value = phone;
+  document.getElementById('moPin').value = pin;
+  loadMyOrders();
 }
 
 /* ---------- ADMIN ---------- */
@@ -576,9 +634,12 @@ function adminAddProduct(){
   const em = document.getElementById('newPEm').value.trim() || "📦";
   const desc = document.getElementById('newPDesc').value.trim();
   const img = document.getElementById('newPImg').value.trim();
+  const img2 = document.getElementById('newPImg2').value.trim();
+  const img3 = document.getElementById('newPImg3').value.trim();
   if(!name || !price){ alert("Nomi va narxini kiriting"); return; }
   const id = "p" + Date.now();
-  const product = {id, name, price, cat, em, desc, img: img||undefined};
+  const images = [img, img2, img3].filter(Boolean); // bo'sh bo'lganlarini olib tashlaymiz
+  const product = {id, name, price, cat, em, desc, img: img||"", images}; // Firebase "undefined"ni qabul qilmaydi, shuning uchun bo'sh qiymatlar "" yoki []
   PRODUCTS.push(product);
   recalcCats(); renderCats(); renderGrid(); renderAdminProducts();
   if(window.FB) window.FB.saveProduct(product);
@@ -588,6 +649,8 @@ function adminAddProduct(){
   document.getElementById('newPEm').value='';
   document.getElementById('newPDesc').value='';
   document.getElementById('newPImg').value='';
+  document.getElementById('newPImg2').value='';
+  document.getElementById('newPImg3').value='';
 }
 function adminDeleteProduct(id){
   if(!confirm("Mahsulotni o'chirishni tasdiqlaysizmi?")) return;
@@ -689,17 +752,42 @@ async function loadMyOrders(){
   const resBox = document.getElementById('myOrdersResult');
   if(!phone || !pin){ alert("Telefon va parolni kiriting"); return; }
   resBox.innerHTML = '<div class="empty-admin">Qidirilmoqda...</div>';
+  const phoneNorm = normalizePhone(phone);
   let myOrders = [];
   if(window.FB){
-    myOrders = await window.FB.getOrdersByPhone(phone, pin);
+    myOrders = await window.FB.getOrdersByPhone(phoneNorm, pin);
   } else {
-    myOrders = orders.filter(o=>o.phone===phone && o.pin===pin);
+    myOrders = orders.filter(o=>normalizePhone(o.phone)===phoneNorm && o.pin===pin);
   }
   if(myOrders.length===0){
     resBox.innerHTML = '<div class="empty-admin">Hech narsa topilmadi. Telefon/parol to\'g\'riligini tekshiring.</div>';
     return;
   }
-  resBox.innerHTML = myOrders.map(o=>`
+  const totalSpent = myOrders.reduce((s,o)=>s+o.total,0);
+  const totalItems = myOrders.reduce((s,o)=>s+o.items.reduce((a,i)=>a+i.qty,0),0);
+  const delivered = myOrders.filter(o=>o.status==='Yetkazildi').length;
+  const sortedByDate = [...myOrders].sort((a,b)=>(a._ts||0)-(b._ts||0));
+  const firstOrder = sortedByDate[0] || myOrders[0];
+  const initial = (firstOrder.name||'?').trim().charAt(0).toUpperCase();
+  const profileHTML = `
+    <div style="display:flex; align-items:center; gap:14px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:18px;">
+      <div style="width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--gold2)); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:800; color:#141414; flex-shrink:0;">${initial}</div>
+      <div>
+        <div style="font-size:17px; font-weight:800;">${firstOrder.name}</div>
+        <div style="font-size:13px; color:var(--muted);">${firstOrder.phone}</div>
+      </div>
+    </div>`;
+  const statsHTML = `
+    <div class="stats" style="grid-template-columns:repeat(3,1fr); margin-bottom:20px;">
+      <div class="stat"><b>${myOrders.length}</b><span>Jami buyurtma</span></div>
+      <div class="stat"><b>${totalItems}</b><span>Sotib olingan dona</span></div>
+      <div class="stat"><b style="font-size:18px;">${fmt(totalSpent)}</b><span>Jami sarflangan (so'm)</span></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h3 style="font-size:15px;">📜 Xaridlar tarixi</h3>
+      <span style="font-size:12px; color:var(--muted);">✅ Yetkazilgan: ${delivered}/${myOrders.length}</span>
+    </div>`;
+  resBox.innerHTML = statsHTML + myOrders.map(o=>`
     <div style="background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:12px;">
       <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
         <b>Buyurtma №${o.id}</b>
@@ -790,9 +878,9 @@ window.FB = {
       await deleteDoc(doc(db, "products", String(id)));
     }catch(e){ console.error("Mahsulot o'chirish xatosi:", e); }
   },
-  async getOrdersByPhone(phone, pin){
+  async getOrdersByPhone(phoneNorm, pin){
     try{
-      const q = query(ordersCol, where("phone","==",phone), where("pin","==",pin));
+      const q = query(ordersCol, where("phoneNorm","==",phoneNorm), where("pin","==",pin));
       const snap = await getDocs(q);
       const list = [];
       snap.forEach(d => list.push(d.data()));
