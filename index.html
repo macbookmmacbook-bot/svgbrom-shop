@@ -742,10 +742,10 @@ const ordersCol = collection(db, "orders");
 
 // --- MAHSULOTLAR: real-vaqtda tinglash ---
 onSnapshot(productsCol, (snap) => {
-  if(snap.empty){
-    // Baza bo'sh bo'lsa — kod ichidagi PRODUCTS bilan bir martalik to'ldiramiz
+  // Agar bazada 5 tadan kam mahsulot bo'lsa (masalan, oldingi xato tufayli to'liq yuklanmagan bo'lsa) — qayta to'ldiramiz
+  if(snap.size < 5){
     window.PRODUCTS_SEED_ONCE && window.PRODUCTS_SEED_ONCE();
-    return;
+    if(snap.empty) return;
   }
   const list = [];
   snap.forEach(d => list.push(d.data()));
@@ -805,8 +805,9 @@ window.FB = {
 window.PRODUCTS_SEED_ONCE = async function(){
   if(window._seeded) return;
   window._seeded = true;
-  for(const p of window.PRODUCTS){
-    try{ await setDoc(doc(db, "products", String(p.id)), p); }catch(e){}
+  const seedList = [...window.PRODUCTS]; // qotgan nusxa — onSnapshot uni o'zgartirib yubormasligi uchun
+  for(const p of seedList){
+    try{ await setDoc(doc(db, "products", String(p.id)), p); }catch(e){ console.error("Seed xatosi:", p.id, e); }
   }
 };
 </script>
