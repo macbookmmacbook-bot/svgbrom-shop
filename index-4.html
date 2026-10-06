@@ -49,6 +49,8 @@
   .subnav .cat-chip.active,.subnav .cat-chip:hover{background:rgba(255,255,255,.1); color:var(--header-text); border-color:rgba(255,255,255,.2);}
   .stars{color:var(--gold2); font-size:12px; display:flex; gap:2px; align-items:center;}
   .stars span{color:var(--muted); font-size:11px; margin-left:3px;}
+  .pin-box{width:56px; height:60px; text-align:center; font-size:26px; font-weight:800; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text);}
+  .pin-box:focus{outline:none; border-color:var(--gold);}
 
   /* HERO */
   .hero{max-width:1200px; margin:0 auto; padding:60px 20px 40px; display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center;}
@@ -78,7 +80,8 @@
   .card-name{font-weight:700; font-size:15px;}
   .card-desc{font-size:12.5px; color:var(--muted); flex:1;}
   .card-foot{display:flex; align-items:center; justify-content:space-between; margin-top:8px;}
-  .price{font-weight:800; font-size:16px; color:var(--gold);}
+  .price{font-weight:800; font-size:16px; color:#e8352c;}
+  .promo-badge{display:inline-flex; align-items:center; background:var(--gold); color:#111; font-size:10px; font-weight:800; padding:2px 8px; border-radius:6px; margin-right:6px; text-transform:uppercase; letter-spacing:.3px;}
   .add-btn{background:var(--bg2); border:1px solid var(--line); border-radius:10px; width:36px; height:36px; font-size:18px; font-weight:800; color:var(--text); cursor:pointer;}
   .add-btn:hover{background:var(--gold); color:#111; border-color:var(--gold);}
 
@@ -104,7 +107,7 @@
   /* CHECKOUT MODAL */
   .modal{position:fixed; inset:0; z-index:110; display:none; align-items:center; justify-content:center; padding:20px;}
   .modal.show{display:flex;}
-  .modal-box{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:28px; width:100%; max-width:400px;}
+  .modal-box{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:28px; width:100%; max-width:400px; max-height:88vh; overflow-y:auto;}
   .modal-box h3{font-size:20px; margin-bottom:6px;}
   .modal-box p{color:var(--muted); font-size:13.5px; margin-bottom:18px;}
   .field{margin-bottom:14px;}
@@ -155,8 +158,8 @@
     <div class="nav-links">
       <a href="#" onclick="showStore()">Katalog</a>
       <a href="#subnavCats">Kategoriyalar</a>
-      <a href="#" onclick="openSeller()">Sotuvchi bo'ling</a>
       <a href="#" onclick="openMyOrders()">👤 Profilim</a>
+      <a href="#" onclick="openSeller()">Sotuvchi bo'ling</a>
     </div>
     <div class="searchbar">
       <input id="searchInput" type="text" placeholder="Mahsulotlarni qidirish..." oninput="searchProducts(this.value)">
@@ -234,19 +237,54 @@
   </div>
 
   <div id="myOrdersLoginBox">
-    <p style="color:var(--muted); font-size:14px; margin-bottom:16px;">Ro'yxatdan o'tganda yoki buyurtma berganda kiritgan telefon va 4 xonali parolingizni yozing.</p>
-    <div class="field"><label>Telefon raqam</label><input id="moPhone" placeholder="+998 90 123 45 67"></div>
-    <div class="field"><label>4 xonali parol</label><input id="moPin" maxlength="4" placeholder="1234"></div>
-    <button class="btn" style="width:100%; justify-content:center;" onclick="loadMyOrders()">Kirish</button>
+    <label style="font-size:13px; font-weight:700; color:var(--muted); display:block; margin-bottom:8px;">Telefon raqamingiz</label>
+    <div style="display:flex; gap:8px; margin-bottom:22px;">
+      <div style="background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-weight:800; font-size:17px;">+998</div>
+      <input id="moPhone" type="tel" placeholder="90 123 45 67" style="flex:1; padding:14px 16px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:17px; font-weight:700;">
+    </div>
+    <label style="font-size:13px; font-weight:700; color:var(--muted); display:block; margin-bottom:8px;">Maxfiy kod</label>
+    <div class="pinboxes" id="moPinBoxes" style="display:flex; gap:10px; margin-bottom:22px;"></div>
+    <input type="hidden" id="moPin">
+    <button class="btn" style="width:100%; justify-content:center;" onclick="loadMyOrders()">Kirish →</button>
   </div>
 
   <div id="registerBox" style="display:none;">
-    <p style="color:var(--muted); font-size:14px; margin-bottom:16px;">Yangi profil yarating — keyin har safar shu telefon+parol bilan kirib, xaridlar tarixingizni ko'rasiz.</p>
+    <label style="font-size:13px; font-weight:700; color:var(--muted); display:block; margin-bottom:8px;">Telefon raqamingiz</label>
+    <div style="display:flex; gap:8px; margin-bottom:18px;">
+      <div style="background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-weight:800; font-size:17px;">+998</div>
+      <input id="regPhone" type="tel" placeholder="90 123 45 67" style="flex:1; padding:14px 16px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:17px; font-weight:700;">
+    </div>
     <div class="field"><label>Ismingiz</label><input id="regName" placeholder="Masalan: Aziz Karimov"></div>
-    <div class="field"><label>Telefon raqam</label><input id="regPhone" placeholder="+998 90 123 45 67"></div>
-    <div class="field"><label>4 xonali parol o'ylab toping</label><input id="regPin" maxlength="4" placeholder="1234"></div>
-    <button class="btn" style="width:100%; justify-content:center;" onclick="registerProfile()">✅ Ro'yxatdan o'tish</button>
+    <button class="btn" style="width:100%; justify-content:center; margin-top:8px;" onclick="startTelegramVerification()">📲 Telegram orqali tasdiqlash</button>
+
+    <div style="margin-top:28px; padding:20px; background:var(--card); border:2px solid var(--gold); border-radius:18px; text-align:center;">
+      <div style="font-size:40px; margin-bottom:10px;">🤖✅</div>
+      <div style="font-size:19px; font-weight:800; margin-bottom:10px;">QANDAY ISHLAYDI?</div>
+      <div style="font-size:15px; line-height:1.9; text-align:left; margin-bottom:16px;">
+        1️⃣ Yuqoridagi ma'lumotlarni to'ldiring<br>
+        2️⃣ <b>"Telegram orqali tasdiqlash"</b> tugmasini bosing<br>
+        3️⃣ Sizga <b style="color:var(--gold)">4 xonali kod</b> ko'rsatiladi<br>
+        4️⃣ Pastdagi <b>botimizga</b> o'tib, shu kodni yuboring<br>
+        5️⃣ Tayyor! Avtomatik ravishda ro'yxatdan o'tasiz ✅
+      </div>
+      <a id="preRegisterBotLink" href="#" target="_blank" style="display:block; background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#141414; font-weight:800; font-size:17px; padding:16px; border-radius:14px;">
+        📲 BIZNING BOTGA O'TISH
+      </a>
+    </div>
   </div>
+
+  <div id="verifyBox" style="display:none; text-align:center;">
+    <div style="font-size:48px; margin-bottom:10px;">📲</div>
+    <h3 style="margin-bottom:10px;">Telegram orqali tasdiqlang</h3>
+    <p style="color:var(--muted); font-size:14px; margin-bottom:18px;">Pastdagi tugmani bosib botimizni oching, so'ng unga shu kodni yuboring. <b>Diqqat:</b> bu kod keyinchalik "Profilim"ga kirish uchun parolingiz bo'ladi — eslab qoling!</p>
+    <div id="verifyCodeBox" style="font-size:36px; font-weight:800; letter-spacing:8px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:18px; color:var(--gold);"></div>
+    <a id="verifyBotLink" href="#" target="_blank" class="btn" style="width:100%; justify-content:center; margin-bottom:14px;">🤖 Botni ochish</a>
+    <div id="verifyStatus" style="color:var(--muted); font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
+      <span style="width:10px; height:10px; border-radius:50%; background:var(--gold); animation:pulse 1s infinite;"></span> Tasdiqlanishi kutilmoqda...
+    </div>
+    <button class="btn ghost" style="width:100%; justify-content:center; margin-top:16px;" onclick="cancelVerification()">Bekor qilish</button>
+  </div>
+  <style>@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}</style>
 
   <div id="myOrdersResult" style="margin-top:20px;"></div>
 </section>
@@ -275,6 +313,7 @@
     <div style="display:flex; gap:10px; margin:22px 0 16px;">
       <div class="cat-chip active" id="adminTabOrders" onclick="switchAdminTab('orders')">📋 Buyurtmalar (arxiv)</div>
       <div class="cat-chip" id="adminTabProducts" onclick="switchAdminTab('products')">📦 Mahsulotlar</div>
+      <div class="cat-chip" id="adminTabUsers" onclick="switchAdminTab('users')">👥 Mijozlar</div>
     </div>
 
     <div id="adminOrdersTab">
@@ -297,6 +336,10 @@
         <button class="btn" style="width:100%; justify-content:center;" onclick="adminAddProduct()">Qo'shish — hammaga darhol ko'rinadi</button>
       </div>
       <div id="productsTableWrap"></div>
+    </div>
+
+    <div id="adminUsersTab" style="display:none">
+      <div id="usersTableWrap"></div>
     </div>
   </div>
 </section>
@@ -325,8 +368,8 @@
   <div class="modal-box" id="checkoutBox">
     <h3>Buyurtmani rasmiylashtirish</h3>
     <p>Ma'lumotlaringizni kiriting, biz siz bilan bog'lanamiz</p>
-    <div class="field"><label>Ism familiya</label><input id="custName" placeholder="Masalan: Aziz Karimov"></div>
     <div class="field"><label>Telefon raqam</label><input id="custPhone" placeholder="+998 90 123 45 67"></div>
+    <div class="field"><label>Ism familiya</label><input id="custName" placeholder="Masalan: Aziz Karimov"></div>
     <div class="field"><label>Manzil</label><input id="custAddress" placeholder="Shahar, tuman, ko'cha"></div>
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeCheckout()">Bekor qilish</button>
@@ -335,7 +378,9 @@
   </div>
 </div>
 
-<footer>© 2026 BROM SHOP — O'zbekiston bo'ylab yetkazib berish. Barcha huquqlar himoyalangan.</footer>
+<footer>© 2026 BROM SHOP — O'zbekiston bo'ylab yetkazib berish. Barcha huquqlar himoyalangan.<br>
+  <a href="https://t.me/amirhonsh" target="_blank" style="color:var(--gold); font-weight:700;">@amirhonsh</a>
+</footer>
 
 <script>
 /* ---------- MA'LUMOTLAR ---------- */
@@ -364,6 +409,8 @@ let cart = {};       // {id: qty}
 let orders = [];      // {id, name, phone, address, items, total, date} — Firestore'dan keladi
 let activeCat = "Barchasi";
 let isAdmin = false;
+let pendingCheckout = false; // ro'yxatdan o'tmasdan "sotib olish" bosilsa, shu true bo'ladi
+window.currentUser = JSON.parse(localStorage.getItem('bromUser') || 'null'); // kirgan mijoz sessiyasi
 const ADMIN_PASS = "brom2026";
 window.PRODUCTS = PRODUCTS;  // Firebase moduli shu massivni to'g'ridan-to'g'ri mutatsiya qiladi
 window.orders = orders;
@@ -371,6 +418,11 @@ window.orders = orders;
 /* ---------- TELEGRAM BOG'LANISHI ---------- */
 const TG_BOT_TOKEN = "8903587459:AAHKvyU5aTxcFfpKPmhEUlisJZGJiUC-GAU";
 const TG_ADMIN_CHAT_ID = "6667031132";
+const TG_BOT_USERNAME = "brom_shop_bot"; // @ belgisisiz, aniq va doimiy
+{
+  const preLink = document.getElementById('preRegisterBotLink');
+  if(preLink) preLink.href = `https://t.me/${TG_BOT_USERNAME}`;
+}
 
 async function sendTelegramOrder(order){
   const itemsText = order.items.map(i => `• ${i.name} x${i.qty} — ${fmt(i.price*i.qty)} so'm`).join('\n');
@@ -440,7 +492,7 @@ function renderGrid(){
         ${starsFor(p.id)}
         <div class="card-desc">${p.desc}</div>
         <div class="card-foot">
-          <div class="price">${fmt(p.price)} so'm</div>
+          <div class="price"><span class="promo-badge">Aksiya</span>${fmt(p.price)} so'm</div>
           <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">+</button>
         </div>
       </div>
@@ -471,14 +523,34 @@ function openProductDetail(id){
     ` : `<div style="height:180px; display:flex; align-items:center; justify-content:center; font-size:72px; background:linear-gradient(160deg,#20242f,#171a22); border-radius:14px; margin-bottom:16px;">${p.em}</div>`}
     <h3 style="font-size:19px; margin-bottom:6px;">${p.name}</h3>
     <p style="color:var(--muted); font-size:14px; margin-bottom:14px;">${p.desc}</p>
-    <div class="price" style="font-size:22px; margin-bottom:18px;">${fmt(p.price)} so'm</div>
+    <div class="price" style="font-size:22px; margin-bottom:18px;"><span class="promo-badge">Aksiya</span>${fmt(p.price)} so'm</div>
     <div class="modal-actions">
       <button class="btn ghost" onclick="addToCart('${p.id}'); closeProductDetail();">🛒 Savatga</button>
       <button class="btn" onclick="buyNow('${p.id}')">Sotib olish</button>
     </div>
+    ${relatedProductsHTML(p)}
   `;
   document.getElementById('productModal').classList.add('show');
   document.getElementById('overlay').classList.add('show');
+}
+function relatedProductsHTML(p){
+  const related = PRODUCTS.filter(x=>x.cat===p.cat && String(x.id)!==String(p.id)).slice(0,4);
+  if(related.length===0) return '';
+  return `
+    <div style="margin-top:22px; padding-top:18px; border-top:1px solid var(--line);">
+      <h4 style="font-size:14px; margin-bottom:12px; color:var(--muted);">O'xshash mahsulotlar</h4>
+      <div style="display:flex; gap:10px; overflow-x:auto;">
+        ${related.map(r=>`
+          <div onclick="openProductDetail('${r.id}')" style="flex:0 0 110px; cursor:pointer;">
+            <div style="height:80px; border-radius:10px; overflow:hidden; background:linear-gradient(160deg,#20242f,#171a22); display:flex; align-items:center; justify-content:center; font-size:30px;">
+              ${r.img ? `<img src="${r.img}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.textContent='${r.em}'">` : r.em}
+            </div>
+            <div style="font-size:11.5px; margin-top:6px; line-height:1.3; max-height:28px; overflow:hidden;">${r.name}</div>
+            <div style="font-size:12px; font-weight:800; color:#e8352c;">${fmt(r.price)} so'm</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
 }
 function closeProductDetail(){
   document.getElementById('productModal').classList.remove('show');
@@ -543,16 +615,25 @@ function closeCart(){ document.getElementById('cartDrawer').classList.remove('sh
 /* ---------- CHECKOUT ---------- */
 function openCheckout(){
   if(cartCount()===0) return;
+  if(!window.currentUser){
+    // Ro'yxatdan o'tmagan mijoz — avval ro'yxatdan o'tkazamiz
+    pendingCheckout = true;
+    closeCart();
+    openMyOrders();
+    switchProfileTab('register');
+    document.getElementById('myOrdersResult').innerHTML = '<div class="empty-admin">🛒 Xarid qilish uchun avval ro\'yxatdan o\'ting — bu bir martalik, keyingi safar kerak bo\'lmaydi.</div>';
+    return;
+  }
   closeCart();
   document.getElementById('checkoutModal').classList.add('show');
   document.getElementById('overlay').classList.add('show');
   document.getElementById('checkoutBox').innerHTML = `
     <h3>Buyurtmani rasmiylashtirish</h3>
-    <p>Ma'lumotlaringizni kiriting, biz siz bilan bog'lanamiz</p>
-    <div class="field"><label>Ism familiya</label><input id="custName" placeholder="Masalan: Aziz Karimov"></div>
-    <div class="field"><label>Telefon raqam</label><input id="custPhone" placeholder="+998 90 123 45 67"></div>
+    <p>Ma'lumotlaringizni tekshirib, manzilni kiriting</p>
+    <div class="field"><label>Telefon raqam</label><input id="custPhone" value="${window.currentUser.phone}"></div>
+    <div class="field"><label>Ism familiya</label><input id="custName" value="${window.currentUser.name}"></div>
     <div class="field"><label>Manzil</label><input id="custAddress" placeholder="Shahar, tuman, ko'cha"></div>
-    <div class="field"><label>4 xonali parol (keyin "Buyurtmalarim"ni ko'rish uchun)</label><input id="custPin" maxlength="4" placeholder="Masalan: 1234"></div>
+    <input type="hidden" id="custPin" value="${window.currentUser.pin}">
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeCheckout()">Bekor qilish</button>
       <button class="btn" onclick="submitOrder()">Tasdiqlash</button>
@@ -608,7 +689,7 @@ function submitOrder(){
 }
 function showMyPurchaseHistory(phone, pin){
   openMyOrders();
-  document.getElementById('moPhone').value = phone;
+  document.getElementById('moPhone').value = normalizePhone(phone).replace(/^998/,'');
   document.getElementById('moPin').value = pin;
   loadMyOrders();
 }
@@ -638,9 +719,32 @@ function adminLogin(){
 function switchAdminTab(tab){
   document.getElementById('adminTabOrders').classList.toggle('active', tab==='orders');
   document.getElementById('adminTabProducts').classList.toggle('active', tab==='products');
+  document.getElementById('adminTabUsers').classList.toggle('active', tab==='users');
   document.getElementById('adminOrdersTab').style.display = tab==='orders' ? 'block' : 'none';
   document.getElementById('adminProductsTab').style.display = tab==='products' ? 'block' : 'none';
+  document.getElementById('adminUsersTab').style.display = tab==='users' ? 'block' : 'none';
   if(tab==='products') renderAdminProducts();
+  if(tab==='users') renderAdminUsers();
+}
+function renderAdminUsers(){
+  const wrap = document.getElementById('usersTableWrap');
+  const list = window.allUsers || [];
+  if(list.length===0){
+    wrap.innerHTML = '<div class="empty-admin">Hali ro\'yxatdan o\'tgan mijoz yo\'q</div>';
+    return;
+  }
+  wrap.innerHTML = `<table>
+    <tr><th>Ism</th><th>Telefon</th><th>Ro'yxatdan o'tgan sana</th><th>Buyurtmalar</th></tr>
+    ${list.map(u=>{
+      const userOrders = orders.filter(o=>o.phoneNorm===u.phoneNorm);
+      return `<tr>
+        <td>${u.name}</td>
+        <td>${u.phone}</td>
+        <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString('uz-UZ') : '—'}</td>
+        <td>${userOrders.length} ta</td>
+      </tr>`;
+    }).join('')}
+  </table>`;
 }
 function renderAdmin(){
   document.getElementById('statOrders').textContent = orders.length;
@@ -807,6 +911,28 @@ function openMyOrders(){
   document.getElementById('sellerView').style.display='none';
   document.getElementById('myOrdersView').style.display='block';
   document.getElementById('myOrdersResult').innerHTML='';
+  setupPinBoxes('moPinBoxes', 'moPin');
+}
+function setupPinBoxes(containerId, hiddenInputId){
+  const container = document.getElementById(containerId);
+  const hidden = document.getElementById(hiddenInputId);
+  container.innerHTML = '';
+  for(let i=0;i<4;i++){
+    const box = document.createElement('input');
+    box.type = 'tel'; box.maxLength = 1; box.className = 'pin-box';
+    box.addEventListener('input', ()=>{
+      box.value = box.value.replace(/\D/g,'').slice(0,1);
+      if(box.value && box.nextElementSibling) box.nextElementSibling.focus();
+      updateHiddenPin();
+    });
+    box.addEventListener('keydown', (e)=>{
+      if(e.key==='Backspace' && !box.value && box.previousElementSibling) box.previousElementSibling.focus();
+    });
+    container.appendChild(box);
+  }
+  function updateHiddenPin(){
+    hidden.value = [...container.children].map(b=>b.value).join('');
+  }
 }
 function switchProfileTab(tab){
   document.getElementById('profTabLogin').classList.toggle('active', tab==='login');
@@ -815,16 +941,113 @@ function switchProfileTab(tab){
   document.getElementById('registerBox').style.display = tab==='register' ? 'block' : 'none';
   document.getElementById('myOrdersResult').innerHTML = '';
 }
+let verifyPollTimer = null;
+let verifyPollOffset = 0;
+let verifyPendingData = null;
+
+async function startTelegramVerification(){
+  const name = document.getElementById('regName').value.trim();
+  const phoneLocal = document.getElementById('regPhone').value.trim();
+  const phone = phoneLocal ? "+998" + phoneLocal.replace(/\D/g,'') : '';
+  if(!name || !phoneLocal){ alert("Ism va telefon raqamingizni to'liq kiriting"); return; }
+  const phoneNorm = normalizePhone(phone);
+  if(window.FB){
+    const existing = await window.FB.getUser(phoneNorm);
+    if(existing){ alert("Bu telefon raqami bilan profil allaqachon mavjud. \"Kirish\" tabidan kiring."); return; }
+  }
+
+  const verifyCode = String(Math.floor(1000 + Math.random()*9000));
+  const pin = verifyCode; // Telegramdan kelgan kodning o'zi — kirish uchun parol bo'ladi
+  verifyPendingData = {name, phone, phoneNorm, pin, verifyCode};
+
+  document.getElementById('registerBox').style.display = 'none';
+  document.getElementById('verifyBox').style.display = 'block';
+  document.getElementById('verifyCodeBox').textContent = verifyCode;
+  document.getElementById('verifyBotLink').href = `https://t.me/${TG_BOT_USERNAME}?start=${verifyCode}`;
+  document.getElementById('verifyStatus').innerHTML = '<span style="width:10px; height:10px; border-radius:50%; background:var(--gold); animation:pulse 1s infinite;"></span> Tasdiqlanishi kutilmoqda...';
+
+  // Eski xabarlarni o'tkazib yuborish uchun hozirgi oxirgi update_id'ni olamiz
+  try{
+    const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?limit=1&offset=-1`);
+    const d = await r.json();
+    if(d.ok && d.result.length) verifyPollOffset = d.result[0].update_id + 1;
+  }catch(e){}
+
+  clearInterval(verifyPollTimer);
+  verifyPollTimer = setInterval(pollForVerification, 3000);
+}
+
+async function pollForVerification(){
+  if(!verifyPendingData) return;
+  try{
+    const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?offset=${verifyPollOffset}&timeout=0`);
+    const d = await r.json();
+    if(!d.ok) return;
+    for(const upd of d.result){
+      verifyPollOffset = upd.update_id + 1;
+      const msg = upd.message;
+      if(!msg || !msg.text) continue;
+      const text = msg.text.replace(/\D/g,'');
+      const codeInText = text.includes(verifyPendingData.verifyCode) || (msg.text.startsWith('/start') && msg.text.includes(verifyPendingData.verifyCode));
+      if(codeInText){
+        await completeVerifiedRegistration(msg.chat.id);
+        return;
+      }
+    }
+  }catch(e){ console.error("Tekshirish xatosi:", e); }
+}
+
+async function completeVerifiedRegistration(telegramChatId){
+  clearInterval(verifyPollTimer);
+  const {name, phone, phoneNorm, pin} = verifyPendingData;
+  document.getElementById('verifyStatus').innerHTML = '✅ Tasdiqlandi!';
+  if(window.FB){
+    await window.FB.registerUser({name, phone, phoneNorm, pin, telegramChatId: String(telegramChatId)});
+  }
+  window.currentUser = {name, phone, phoneNorm, pin};
+  localStorage.setItem('bromUser', JSON.stringify(window.currentUser));
+  verifyPendingData = null;
+  setTimeout(()=>{
+    document.getElementById('verifyBox').style.display = 'none';
+    if(pendingCheckout){
+      pendingCheckout = false;
+      openCheckout();
+    } else {
+      alert("Ro'yxatdan muvaffaqiyatli o'tdingiz!");
+      switchProfileTab('login');
+      document.getElementById('moPhone').value = phone.replace('+998','');
+      document.getElementById('moPin').value = pin;
+      loadMyOrders();
+    }
+  }, 1000);
+}
+
+function cancelVerification(){
+  clearInterval(verifyPollTimer);
+  verifyPendingData = null;
+  document.getElementById('verifyBox').style.display = 'none';
+  document.getElementById('registerBox').style.display = 'block';
+}
+
 async function registerProfile(){
   const name = document.getElementById('regName').value.trim();
-  const phone = document.getElementById('regPhone').value.trim();
+  const phoneLocal = document.getElementById('regPhone').value.trim();
+  const phone = phoneLocal ? "+998" + phoneLocal.replace(/\D/g,'') : '';
   const pin = document.getElementById('regPin').value.trim();
-  if(!name || !phone || pin.length!==4){ alert("Ism, telefon va 4 xonali parolni to'liq kiriting"); return; }
+  if(!name || !phoneLocal || pin.length!==4){ alert("Ism, telefon va 4 xonali kodni to'liq kiriting"); return; }
   const phoneNorm = normalizePhone(phone);
   if(window.FB){
     const existing = await window.FB.getUser(phoneNorm);
     if(existing){ alert("Bu telefon raqami bilan profil allaqachon mavjud. \"Kirish\" tabidan kiring."); return; }
     await window.FB.registerUser({name, phone, phoneNorm, pin});
+  }
+  window.currentUser = {name, phone, phoneNorm, pin};
+  localStorage.setItem('bromUser', JSON.stringify(window.currentUser));
+  if(pendingCheckout){
+    pendingCheckout = false;
+    alert("Profil yaratildi! Endi buyurtmangizni yakunlaymiz.");
+    openCheckout();
+    return;
   }
   alert("Profil yaratildi! Endi shu telefon+parol bilan kirishingiz mumkin.");
   switchProfileTab('login');
@@ -833,10 +1056,11 @@ async function registerProfile(){
   loadMyOrders();
 }
 async function loadMyOrders(){
-  const phone = document.getElementById('moPhone').value.trim();
+  const phoneLocal = document.getElementById('moPhone').value.trim();
+  const phone = phoneLocal ? "+998" + phoneLocal.replace(/\D/g,'') : '';
   const pin = document.getElementById('moPin').value.trim();
   const resBox = document.getElementById('myOrdersResult');
-  if(!phone || !pin){ alert("Telefon va parolni kiriting"); return; }
+  if(!phoneLocal || pin.length!==4){ alert("Telefon va 4 xonali kodni to'liq kiriting"); return; }
   resBox.innerHTML = '<div class="empty-admin">Qidirilmoqda...</div>';
   const phoneNorm = normalizePhone(phone);
   let userProfile = null;
@@ -852,6 +1076,10 @@ async function loadMyOrders(){
     resBox.innerHTML = '<div class="empty-admin">Hech narsa topilmadi. Telefon/parol to\'g\'riligini tekshiring, yoki avval ro\'yxatdan o\'ting.</div>';
     return;
   }
+  const loggedInName = (userProfile && userProfile.name) || (myOrders[0] && myOrders[0].name) || '';
+  window.currentUser = {name: loggedInName, phone, phoneNorm, pin};
+  localStorage.setItem('bromUser', JSON.stringify(window.currentUser));
+  if(pendingCheckout){ pendingCheckout = false; openCheckout(); return; }
   const totalSpent = myOrders.reduce((s,o)=>s+o.total,0);
   const totalItems = myOrders.reduce((s,o)=>s+o.items.reduce((a,i)=>a+i.qty,0),0);
   const delivered = myOrders.filter(o=>o.status==='Yetkazildi').length;
@@ -891,6 +1119,13 @@ async function loadMyOrders(){
 }
 
 /* ---------- INIT ---------- */
+function toggleTheme(){
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeToggleBtn').textContent = isDark ? '🌙' : '☀️';
+}
+
 renderCats();
 renderGrid();
 updateCartUI();
@@ -969,6 +1204,18 @@ onSnapshot(ordersCol, (snap) => {
   window.orders.length = 0;
   list.forEach(o => window.orders.push(o));
   if(window.isAdmin) window.renderAdmin();
+});
+
+// --- MIJOZLAR (ro'yxatdan o'tganlar): real-vaqtda tinglash ---
+window.allUsers = [];
+onSnapshot(usersCol, (snap) => {
+  const list = [];
+  snap.forEach(d => list.push(d.data()));
+  list.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  window.allUsers = list;
+  if(window.isAdmin && document.getElementById('adminUsersTab') && document.getElementById('adminUsersTab').style.display !== 'none'){
+    window.renderAdminUsers();
+  }
 });
 
 window.FB = {
