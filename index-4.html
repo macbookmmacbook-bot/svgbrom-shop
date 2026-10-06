@@ -50,6 +50,11 @@
   .stars{color:var(--gold2); font-size:12px; display:flex; gap:2px; align-items:center;}
   .stars span{color:var(--muted); font-size:11px; margin-left:3px;}
   .pin-box{width:56px; height:60px; text-align:center; font-size:26px; font-weight:800; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text);}
+  .bottom-tabbar{position:fixed; bottom:0; left:0; right:0; z-index:60; background:var(--header-bg); display:flex; justify-content:space-around; padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px)); border-top:1px solid rgba(255,255,255,.08);}
+  .tab-item{display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--header-muted); font-size:11px; font-weight:700; cursor:pointer; padding:4px 14px;}
+  .tab-item span{font-size:21px;}
+  .tab-item:hover{color:var(--header-text);}
+  body{padding-bottom:64px;}
   .pin-box:focus{outline:none; border-color:var(--gold);}
 
   /* HERO */
@@ -158,7 +163,6 @@
     <div class="nav-links">
       <a href="#" onclick="showStore()">Katalog</a>
       <a href="#subnavCats">Kategoriyalar</a>
-      <a href="#" onclick="openMyOrders()">👤 Profilim</a>
       <a href="#" onclick="openSeller()">Sotuvchi bo'ling</a>
     </div>
     <div class="searchbar">
@@ -231,7 +235,7 @@
   <a class="btn ghost" href="#" onclick="showStore()" style="margin-bottom:20px; display:inline-flex;">← Do'konga qaytish</a>
   <h2 style="font-size:24px; margin-bottom:6px;">👤 Profilim</h2>
 
-  <div style="display:flex; gap:10px; margin-bottom:20px;">
+  <div id="profileTabsRow" style="display:flex; gap:10px; margin-bottom:20px;">
     <div class="cat-chip active" id="profTabLogin" onclick="switchProfileTab('login')">Kirish</div>
     <div class="cat-chip" id="profTabRegister" onclick="switchProfileTab('register')">Ro'yxatdan o'tish</div>
   </div>
@@ -274,13 +278,23 @@
   </div>
 
   <div id="verifyBox" style="display:none; text-align:center;">
-    <div style="font-size:48px; margin-bottom:10px;">📲</div>
-    <h3 style="margin-bottom:10px;">Telegram orqali tasdiqlang</h3>
-    <p style="color:var(--muted); font-size:14px; margin-bottom:18px;">Pastdagi tugmani bosib botimizni oching, so'ng unga shu kodni yuboring. <b>Diqqat:</b> bu kod keyinchalik "Profilim"ga kirish uchun parolingiz bo'ladi — eslab qoling!</p>
-    <div id="verifyCodeBox" style="font-size:36px; font-weight:800; letter-spacing:8px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:18px; color:var(--gold);"></div>
-    <a id="verifyBotLink" href="#" target="_blank" class="btn" style="width:100%; justify-content:center; margin-bottom:14px;">🤖 Botni ochish</a>
-    <div id="verifyStatus" style="color:var(--muted); font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
-      <span style="width:10px; height:10px; border-radius:50%; background:var(--gold); animation:pulse 1s infinite;"></span> Tasdiqlanishi kutilmoqda...
+    <div id="verifyStep1">
+      <div style="font-size:48px; margin-bottom:10px;">📲</div>
+      <h3 style="margin-bottom:10px;">1. Botni oching va Start bosing</h3>
+      <p style="color:var(--muted); font-size:14px; margin-bottom:18px;">Pastdagi tugmani bosib botimizni oching va <b>Start</b> tugmasini bosing — sizga darhol tasdiqlovchi kod yuboriladi.</p>
+      <a id="verifyBotLink" href="#" target="_blank" class="btn" style="width:100%; justify-content:center; margin-bottom:14px;">🤖 Botni ochish</a>
+      <div id="verifyStatus" style="color:var(--muted); font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
+        <span style="width:10px; height:10px; border-radius:50%; background:var(--gold); animation:pulse 1s infinite;"></span> Botga kirishingiz kutilmoqda...
+      </div>
+    </div>
+    <div id="verifyStep2" style="display:none;">
+      <div style="font-size:48px; margin-bottom:10px;">✅</div>
+      <h3 style="margin-bottom:10px;">2. Kodni kiriting</h3>
+      <p style="color:var(--muted); font-size:14px; margin-bottom:18px;">Telegram botimizga kod yuborildi. Uni ko'chirib, shu yerga kiriting:</p>
+      <div class="pinboxes" id="verifyPinBoxes" style="display:flex; gap:10px; justify-content:center; margin-bottom:18px;"></div>
+      <input type="hidden" id="verifyInputPin">
+      <button class="btn" style="width:100%; justify-content:center;" onclick="submitVerifyCode()">Tasdiqlash →</button>
+      <div id="verifyError" style="color:var(--danger); font-size:13px; margin-top:10px;"></div>
     </div>
     <button class="btn ghost" style="width:100%; justify-content:center; margin-top:16px;" onclick="cancelVerification()">Bekor qilish</button>
   </div>
@@ -377,6 +391,14 @@
     </div>
   </div>
 </div>
+
+<nav class="bottom-tabbar">
+  <div class="tab-item" onclick="showStore()"><span>🏠</span>Bosh sahifa</div>
+  <div class="tab-item" onclick="showStore(); document.getElementById('subnavCats').scrollIntoView({behavior:'smooth'});"><span>📂</span>Kategoriya</div>
+  <div class="tab-item" onclick="openCart()"><span>🛒</span>Savat</div>
+  <div class="tab-item" onclick="openMyOrders()"><span>👤</span>Profilim</div>
+  <div class="tab-item" id="logoutTabBtn" onclick="logoutProfile()" style="display:none;"><span>🚪</span>Chiqish</div>
+</nav>
 
 <footer>© 2026 BROM SHOP — O'zbekiston bo'ylab yetkazib berish. Barcha huquqlar himoyalangan.<br>
   <a href="https://t.me/amirhonsh" target="_blank" style="color:var(--gold); font-weight:700;">@amirhonsh</a>
@@ -911,7 +933,39 @@ function openMyOrders(){
   document.getElementById('sellerView').style.display='none';
   document.getElementById('myOrdersView').style.display='block';
   document.getElementById('myOrdersResult').innerHTML='';
+
+  if(window.currentUser){
+    // Allaqachon ro'yxatdan o'tgan — formani ko'rsatmasdan to'g'ridan-to'g'ri profilni ochamiz
+    document.getElementById('profileTabsRow').style.display = 'none';
+    document.getElementById('myOrdersLoginBox').style.display = 'none';
+    document.getElementById('registerBox').style.display = 'none';
+    document.getElementById('verifyBox').style.display = 'none';
+    loadMyOrdersForCurrentUser();
+    return;
+  }
+  document.getElementById('profileTabsRow').style.display = 'flex';
   setupPinBoxes('moPinBoxes', 'moPin');
+}
+async function loadMyOrdersForCurrentUser(){
+  const resBox = document.getElementById('myOrdersResult');
+  resBox.innerHTML = '<div class="empty-admin">Yuklanmoqda...</div>';
+  const {phoneNorm, pin} = window.currentUser;
+  let myOrders = [];
+  if(window.FB) myOrders = await window.FB.getOrdersByPhone(phoneNorm, pin);
+  else myOrders = orders.filter(o=>o.phoneNorm===phoneNorm && o.pin===pin);
+  renderProfileResult(window.currentUser, myOrders);
+  const logoutHTML = `<div style="text-align:center; margin-top:18px;"><a href="#" onclick="logoutProfile(); return false;" style="color:var(--muted); font-size:13px; text-decoration:underline;">Chiqish</a></div>`;
+  resBox.insertAdjacentHTML('beforeend', logoutHTML);
+}
+function logoutProfile(){
+  window.currentUser = null;
+  localStorage.removeItem('bromUser');
+  updateLogoutTabVisibility();
+  openMyOrders();
+}
+function updateLogoutTabVisibility(){
+  const btn = document.getElementById('logoutTabBtn');
+  if(btn) btn.style.display = window.currentUser ? 'flex' : 'none';
 }
 function setupPinBoxes(containerId, hiddenInputId){
   const container = document.getElementById(containerId);
@@ -956,15 +1010,13 @@ async function startTelegramVerification(){
     if(existing){ alert("Bu telefon raqami bilan profil allaqachon mavjud. \"Kirish\" tabidan kiring."); return; }
   }
 
-  const verifyCode = String(Math.floor(1000 + Math.random()*9000));
-  const pin = verifyCode; // Telegramdan kelgan kodning o'zi — kirish uchun parol bo'ladi
-  verifyPendingData = {name, phone, phoneNorm, pin, verifyCode};
+  verifyPendingData = {name, phone, phoneNorm};
 
   document.getElementById('registerBox').style.display = 'none';
   document.getElementById('verifyBox').style.display = 'block';
-  document.getElementById('verifyCodeBox').textContent = verifyCode;
-  document.getElementById('verifyBotLink').href = `https://t.me/${TG_BOT_USERNAME}?start=${verifyCode}`;
-  document.getElementById('verifyStatus').innerHTML = '<span style="width:10px; height:10px; border-radius:50%; background:var(--gold); animation:pulse 1s infinite;"></span> Tasdiqlanishi kutilmoqda...';
+  document.getElementById('verifyStep1').style.display = 'block';
+  document.getElementById('verifyStep2').style.display = 'none';
+  document.getElementById('verifyBotLink').href = `https://t.me/${TG_BOT_USERNAME}`;
 
   // Eski xabarlarni o'tkazib yuborish uchun hozirgi oxirgi update_id'ni olamiz
   try{
@@ -974,10 +1026,11 @@ async function startTelegramVerification(){
   }catch(e){}
 
   clearInterval(verifyPollTimer);
-  verifyPollTimer = setInterval(pollForVerification, 3000);
+  verifyPollTimer = setInterval(pollForBotStart, 2000);
 }
 
-async function pollForVerification(){
+// 1-bosqich: foydalanuvchi botga /start bosishini kutamiz, topilsa — kodni yuboramiz
+async function pollForBotStart(){
   if(!verifyPendingData) return;
   try{
     const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?offset=${verifyPollOffset}&timeout=0`);
@@ -986,40 +1039,58 @@ async function pollForVerification(){
     for(const upd of d.result){
       verifyPollOffset = upd.update_id + 1;
       const msg = upd.message;
-      if(!msg || !msg.text) continue;
-      const text = msg.text.replace(/\D/g,'');
-      const codeInText = text.includes(verifyPendingData.verifyCode) || (msg.text.startsWith('/start') && msg.text.includes(verifyPendingData.verifyCode));
-      if(codeInText){
-        await completeVerifiedRegistration(msg.chat.id);
-        return;
-      }
+      if(!msg) continue;
+      // Birinchi kelgan xabar (odatda /start) — shu odamga kod yuboramiz
+      clearInterval(verifyPollTimer);
+      const code = String(Math.floor(1000 + Math.random()*9000));
+      verifyPendingData.verifyCode = code;
+      verifyPendingData.telegramChatId = String(msg.chat.id);
+      try{
+        await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ chat_id: msg.chat.id, text: `🔐 BROM SHOP tasdiqlovchi kodingiz:\n\n${code}\n\nShu kodni saytga kiriting.` })
+        });
+      }catch(e){ console.error("Kod yuborilmadi:", e); }
+      document.getElementById('verifyStep1').style.display = 'none';
+      document.getElementById('verifyStep2').style.display = 'block';
+      setupPinBoxes('verifyPinBoxes', 'verifyInputPin');
+      return;
     }
   }catch(e){ console.error("Tekshirish xatosi:", e); }
 }
 
-async function completeVerifiedRegistration(telegramChatId){
-  clearInterval(verifyPollTimer);
-  const {name, phone, phoneNorm, pin} = verifyPendingData;
-  document.getElementById('verifyStatus').innerHTML = '✅ Tasdiqlandi!';
+function submitVerifyCode(){
+  const entered = document.getElementById('verifyInputPin').value.trim();
+  const errBox = document.getElementById('verifyError');
+  if(!verifyPendingData || !verifyPendingData.verifyCode){ errBox.textContent = "Avval botdan kodni kuting"; return; }
+  if(entered.length!==4){ errBox.textContent = "4 xonali kodni to'liq kiriting"; return; }
+  if(entered !== verifyPendingData.verifyCode){ errBox.textContent = "Kod noto'g'ri, qaytadan tekshiring"; return; }
+  errBox.textContent = '';
+  completeVerifiedRegistration();
+}
+
+async function completeVerifiedRegistration(){
+  const {name, phone, phoneNorm, verifyCode, telegramChatId} = verifyPendingData;
+  const pin = verifyCode; // Telegramdan kelgan kodning o'zi — kirish uchun parol bo'ladi
   if(window.FB){
-    await window.FB.registerUser({name, phone, phoneNorm, pin, telegramChatId: String(telegramChatId)});
+    await window.FB.registerUser({name, phone, phoneNorm, pin, telegramChatId});
   }
   window.currentUser = {name, phone, phoneNorm, pin};
   localStorage.setItem('bromUser', JSON.stringify(window.currentUser));
+  updateLogoutTabVisibility();
   verifyPendingData = null;
-  setTimeout(()=>{
-    document.getElementById('verifyBox').style.display = 'none';
-    if(pendingCheckout){
-      pendingCheckout = false;
-      openCheckout();
-    } else {
-      alert("Ro'yxatdan muvaffaqiyatli o'tdingiz!");
-      switchProfileTab('login');
-      document.getElementById('moPhone').value = phone.replace('+998','');
-      document.getElementById('moPin').value = pin;
-      loadMyOrders();
-    }
-  }, 1000);
+  document.getElementById('verifyBox').style.display = 'none';
+  if(pendingCheckout){
+    pendingCheckout = false;
+    openCheckout();
+  } else {
+    alert("Ro'yxatdan muvaffaqiyatli o'tdingiz!");
+    switchProfileTab('login');
+    document.getElementById('moPhone').value = phone.replace('+998','');
+    document.getElementById('moPin').value = pin;
+    loadMyOrders();
+  }
 }
 
 function cancelVerification(){
@@ -1055,43 +1126,18 @@ async function registerProfile(){
   document.getElementById('moPin').value = pin;
   loadMyOrders();
 }
-async function loadMyOrders(){
-  const phoneLocal = document.getElementById('moPhone').value.trim();
-  const phone = phoneLocal ? "+998" + phoneLocal.replace(/\D/g,'') : '';
-  const pin = document.getElementById('moPin').value.trim();
+function renderProfileResult(user, myOrders){
   const resBox = document.getElementById('myOrdersResult');
-  if(!phoneLocal || pin.length!==4){ alert("Telefon va 4 xonali kodni to'liq kiriting"); return; }
-  resBox.innerHTML = '<div class="empty-admin">Qidirilmoqda...</div>';
-  const phoneNorm = normalizePhone(phone);
-  let userProfile = null;
-  let myOrders = [];
-  if(window.FB){
-    userProfile = await window.FB.getUser(phoneNorm);
-    if(userProfile && userProfile.pin !== pin) userProfile = null; // parol mos kelmasa — rad etamiz
-    myOrders = await window.FB.getOrdersByPhone(phoneNorm, pin);
-  } else {
-    myOrders = orders.filter(o=>normalizePhone(o.phone)===phoneNorm && o.pin===pin);
-  }
-  if(!userProfile && myOrders.length===0){
-    resBox.innerHTML = '<div class="empty-admin">Hech narsa topilmadi. Telefon/parol to\'g\'riligini tekshiring, yoki avval ro\'yxatdan o\'ting.</div>';
-    return;
-  }
-  const loggedInName = (userProfile && userProfile.name) || (myOrders[0] && myOrders[0].name) || '';
-  window.currentUser = {name: loggedInName, phone, phoneNorm, pin};
-  localStorage.setItem('bromUser', JSON.stringify(window.currentUser));
-  if(pendingCheckout){ pendingCheckout = false; openCheckout(); return; }
   const totalSpent = myOrders.reduce((s,o)=>s+o.total,0);
   const totalItems = myOrders.reduce((s,o)=>s+o.items.reduce((a,i)=>a+i.qty,0),0);
   const delivered = myOrders.filter(o=>o.status==='Yetkazildi').length;
-  const sortedByDate = [...myOrders].sort((a,b)=>(a._ts||0)-(b._ts||0));
-  const firstOrder = userProfile || sortedByDate[0] || myOrders[0];
-  const initial = (firstOrder.name||'?').trim().charAt(0).toUpperCase();
+  const initial = (user.name||'?').trim().charAt(0).toUpperCase();
   const profileHTML = `
     <div style="display:flex; align-items:center; gap:14px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:18px;">
       <div style="width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--gold2)); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:800; color:#141414; flex-shrink:0;">${initial}</div>
       <div>
-        <div style="font-size:17px; font-weight:800;">${firstOrder.name}</div>
-        <div style="font-size:13px; color:var(--muted);">${firstOrder.phone}</div>
+        <div style="font-size:17px; font-weight:800;">${user.name}</div>
+        <div style="font-size:13px; color:var(--muted);">${user.phone}</div>
       </div>
     </div>`;
   const statsHTML = `
@@ -1118,6 +1164,36 @@ async function loadMyOrders(){
   resBox.innerHTML = profileHTML + statsHTML + ordersListHTML;
 }
 
+async function loadMyOrders(){
+  const phoneLocal = document.getElementById('moPhone').value.trim();
+  const phone = phoneLocal ? "+998" + phoneLocal.replace(/\D/g,'') : '';
+  const pin = document.getElementById('moPin').value.trim();
+  const resBox = document.getElementById('myOrdersResult');
+  if(!phoneLocal || pin.length!==4){ alert("Telefon va 4 xonali kodni to'liq kiriting"); return; }
+  resBox.innerHTML = '<div class="empty-admin">Qidirilmoqda...</div>';
+  const phoneNorm = normalizePhone(phone);
+  let userProfile = null;
+  let myOrders = [];
+  if(window.FB){
+    userProfile = await window.FB.getUser(phoneNorm);
+    if(userProfile && userProfile.pin !== pin) userProfile = null; // parol mos kelmasa — rad etamiz
+    myOrders = await window.FB.getOrdersByPhone(phoneNorm, pin);
+  } else {
+    myOrders = orders.filter(o=>normalizePhone(o.phone)===phoneNorm && o.pin===pin);
+  }
+  if(!userProfile && myOrders.length===0){
+    resBox.innerHTML = '<div class="empty-admin">Hech narsa topilmadi. Telefon/parol to\'g\'riligini tekshiring, yoki avval ro\'yxatdan o\'ting.</div>';
+    return;
+  }
+  const loggedInName = (userProfile && userProfile.name) || (myOrders[0] && myOrders[0].name) || '';
+  window.currentUser = {name: loggedInName, phone, phoneNorm, pin};
+  localStorage.setItem('bromUser', JSON.stringify(window.currentUser));
+  updateLogoutTabVisibility();
+  if(pendingCheckout){ pendingCheckout = false; openCheckout(); return; }
+  renderProfileResult(window.currentUser, myOrders);
+  document.getElementById('profileTabsRow').style.display = 'none';
+}
+
 /* ---------- INIT ---------- */
 function toggleTheme(){
   const html = document.documentElement;
@@ -1129,6 +1205,7 @@ function toggleTheme(){
 renderCats();
 renderGrid();
 updateCartUI();
+updateLogoutTabVisibility();
 
 /* ---------- HERO BANNER: video → reklama rasmi → video (sikl) ---------- */
 (function heroCarousel(){
