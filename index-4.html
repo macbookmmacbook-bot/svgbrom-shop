@@ -153,6 +153,73 @@
     table{font-size:12px;}
     th,td{padding:9px 8px;}
   }
+
+  /* ================= KREATIV DIZAYN QATLAMI ================= */
+  @keyframes floatA{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(40px,30px) scale(1.15);}}
+  @keyframes floatB{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-50px,40px) scale(1.2);}}
+  @keyframes shineText{to{background-position:200% center;}}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(24px);}to{opacity:1; transform:translateY(0);}}
+  @keyframes marqueeMove{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  @keyframes glowPulse{0%,100%{box-shadow:0 20px 60px rgba(232,53,44,.18);}50%{box-shadow:0 24px 80px rgba(254,189,105,.35);}}
+
+  #storeView{position:relative; overflow:hidden;}
+  #storeView::before,#storeView::after{content:""; position:absolute; border-radius:50%; filter:blur(90px); opacity:.45; pointer-events:none; z-index:0;}
+  #storeView::before{width:420px; height:420px; background:#febd69; top:-120px; left:-100px; animation:floatA 14s ease-in-out infinite;}
+  #storeView::after{width:380px; height:380px; background:#ff5c4d; top:60px; right:-120px; opacity:.28; animation:floatB 17s ease-in-out infinite;}
+  #storeView > *{position:relative; z-index:1;}
+
+  header{background:linear-gradient(90deg,#131921,#1d2a3a); box-shadow:0 6px 24px rgba(0,0,0,.25);}
+
+  .hero h1{font-size:50px; letter-spacing:-.5px;}
+  .hero h1::before{content:"🔥 Haftalik aksiya — chegirmalar boshlandi"; display:block; width:max-content; font-family:'Manrope',sans-serif; font-size:12px; font-weight:800; letter-spacing:.4px; padding:7px 14px; border-radius:100px; background:rgba(232,53,44,.12); color:#e8352c; margin-bottom:16px;}
+  .hero h1 span{background:linear-gradient(90deg,#e8352c,#f3a847,#e8352c); background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation:shineText 4s linear infinite;}
+  .hero .btn{font-size:16px; padding:16px 30px; box-shadow:0 10px 28px rgba(243,168,71,.45);}
+  .hero-visual{animation:glowPulse 5s ease-in-out infinite; border:2px solid rgba(254,189,105,.6);}
+
+  .btn{transition:transform .2s, box-shadow .2s;}
+  .btn:hover{transform:translateY(-2px); box-shadow:0 10px 24px rgba(243,168,71,.4);}
+
+  .marquee{overflow:hidden; background:linear-gradient(90deg,#e8352c,#f3a847); color:#fff; padding:11px 0; margin:6px 0 26px; transform:rotate(-0.6deg);}
+  .marquee-track{display:flex; width:max-content; animation:marqueeMove 28s linear infinite;}
+  .marquee-track span{padding:0 34px; font-weight:800; font-size:14px; white-space:nowrap;}
+
+  .perks{max-width:1200px; margin:0 auto 34px; padding:0 20px; display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+  .perk{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px 16px; display:flex; align-items:center; gap:12px; transition:.25s; animation:fadeUp .6s ease backwards;}
+  .perk:nth-child(2){animation-delay:.1s;} .perk:nth-child(3){animation-delay:.2s;} .perk:nth-child(4){animation-delay:.3s;}
+  .perk:hover{transform:translateY(-4px); box-shadow:0 14px 30px rgba(0,0,0,.12); border-color:var(--gold);}
+  .perk .pi{font-size:30px; width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg,var(--gold),var(--gold2)); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .perk b{display:block; font-size:14px;}
+  .perk small{color:var(--muted); font-size:12px;}
+
+  .section-title h2{position:relative; padding-left:16px; font-size:28px;}
+  .section-title h2::before{content:""; position:absolute; left:0; top:4px; bottom:4px; width:6px; border-radius:6px; background:linear-gradient(180deg,#e8352c,#febd69);}
+
+  .card{animation:fadeUp .55s ease backwards; box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .card:nth-child(1){animation-delay:.03s;} .card:nth-child(2){animation-delay:.08s;} .card:nth-child(3){animation-delay:.13s;} .card:nth-child(4){animation-delay:.18s;}
+  .card:nth-child(5){animation-delay:.23s;} .card:nth-child(6){animation-delay:.28s;} .card:nth-child(7){animation-delay:.33s;} .card:nth-child(8){animation-delay:.38s;}
+  .card:hover{transform:translateY(-8px); box-shadow:0 22px 44px rgba(232,53,44,.16); border-color:var(--gold);}
+  .card::after{content:""; position:absolute; top:0; left:-120%; width:55%; height:100%; background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent); transform:skewX(-20deg); transition:left .7s; pointer-events:none;}
+  .card:hover::after{left:150%;}
+  .card-img{background:linear-gradient(160deg,#fff7e6,#ffe9c7);}
+  [data-theme="dark"] .card-img{background:linear-gradient(160deg,#20242f,#171a22);}
+  .card-img img{transition:transform .5s;}
+  .card:hover .card-img img{transform:scale(1.1);}
+  .add-btn{background:linear-gradient(135deg,var(--gold),var(--gold2)); border:none; color:#111; width:38px; height:38px; border-radius:50%; font-size:20px; transition:transform .25s;}
+  .add-btn:hover{transform:rotate(90deg) scale(1.12); background:linear-gradient(135deg,#e8352c,#ff5c4d); color:#fff;}
+  .price{font-size:17px;}
+
+  .bottom-tabbar{backdrop-filter:blur(14px); background:rgba(19,25,33,.92); border-radius:20px 20px 0 0; box-shadow:0 -8px 30px rgba(0,0,0,.25);}
+  .tab-item{transition:transform .2s, color .2s;}
+  .tab-item:hover{transform:translateY(-3px); color:var(--gold);}
+
+  footer{background:linear-gradient(180deg,transparent,rgba(254,189,105,.12)); border-top:3px solid; border-image:linear-gradient(90deg,#e8352c,#febd69,#e8352c) 1;}
+
+  @media(max-width:820px){
+    .hero h1{font-size:34px;}
+    .hero h1::before{margin-left:auto; margin-right:auto;}
+    .perks{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important;}}
 </style>
 </head>
 <body>
@@ -197,6 +264,18 @@
       <div id="heroAdBadge" style="position:absolute; bottom:14px; left:14px; z-index:3; background:var(--gold); color:#141414; font-weight:800; font-size:12px; padding:5px 12px; border-radius:100px; opacity:0; transition:opacity .8s ease;">📢 Reklama</div>
     </div>
   </section>
+
+  <div class="marquee"><div class="marquee-track">
+    <span>🚚 O'zbekiston bo'ylab yetkazib berish</span><span>🛡️ Kafolatli mahsulotlar</span><span>🔥 Haftalik aksiyalar</span><span>📞 Doimiy qo'llab-quvvatlash</span><span>⭐ Sifat — BROM SHOP'da</span>
+    <span>🚚 O'zbekiston bo'ylab yetkazib berish</span><span>🛡️ Kafolatli mahsulotlar</span><span>🔥 Haftalik aksiyalar</span><span>📞 Doimiy qo'llab-quvvatlash</span><span>⭐ Sifat — BROM SHOP'da</span>
+  </div></div>
+
+  <div class="perks">
+    <div class="perk"><div class="pi">🚚</div><div><b>Tez yetkazish</b><small>Buyurtmangiz manzilingizgacha yetkaziladi</small></div></div>
+    <div class="perk"><div class="pi">🛡️</div><div><b>Kafolat</b><small>Mahsulotlarga kafolat beriladi</small></div></div>
+    <div class="perk"><div class="pi">💳</div><div><b>Qulay to'lov</b><small>Sizga qulay usulda to'lang</small></div></div>
+    <a class="perk" href="tel:+998335318494"><div class="pi">📞</div><div><b>Qo'llab-quvvatlash</b><small>+998 33 531 84 94</small></div></a>
+  </div>
 
   <div class="section-title"><h2>Mahsulotlar</h2></div>
   <div class="grid" id="grid"></div>
