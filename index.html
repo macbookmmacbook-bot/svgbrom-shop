@@ -220,6 +220,31 @@
     .perks{grid-template-columns:repeat(2,1fr);}
   }
   @media (prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important;}}
+
+  /* ================= LANDING (KIRISH SAHIFASI) ================= */
+  @keyframes landFade{from{opacity:0; transform:translateY(28px);}to{opacity:1; transform:translateY(0);}}
+  @keyframes scrollHint{0%,100%{transform:translateY(0); opacity:.6;}50%{transform:translateY(8px); opacity:1;}}
+  #landingView{position:fixed; inset:0; z-index:200; background:#07080c; overflow:hidden; display:none;}
+  #landingView.show{display:block;}
+  #landingVideo{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.5; filter:saturate(1.1) contrast(1.05);}
+  .land-veil{position:absolute; inset:0; background:radial-gradient(1100px 620px at 50% 38%, rgba(232,53,44,.28), transparent 62%), linear-gradient(180deg, rgba(7,8,12,.55) 0%, rgba(7,8,12,.82) 58%, #07080c 100%);}
+  .land-wrap{position:relative; z-index:2; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:28px 22px calc(28px + env(safe-area-inset-bottom,0px)); color:#fff; overflow-y:auto;}
+  .land-logo{font-family:'Sora',sans-serif; font-size:20px; font-weight:800; letter-spacing:3px; margin-bottom:22px; animation:landFade .6s ease backwards;}
+  .land-logo span{color:#febd69;}
+  .land-tag{display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:800; letter-spacing:.4px; padding:8px 16px; border-radius:100px; border:1px solid rgba(254,189,105,.45); background:rgba(254,189,105,.1); color:#febd69; margin-bottom:20px; animation:landFade .6s ease .05s backwards;}
+  .land-wrap h1{font-size:clamp(34px,7vw,66px); line-height:1.05; font-weight:800; letter-spacing:-1px; max-width:900px; animation:landFade .7s ease .12s backwards;}
+  .land-wrap h1 em{font-style:normal; background:linear-gradient(90deg,#e8352c,#f3a847,#febd69); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .land-wrap p{font-size:clamp(15px,2vw,19px); color:#b9bec7; max-width:540px; margin:20px auto 30px; line-height:1.6; animation:landFade .7s ease .2s backwards;}
+  .land-cta{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; animation:landFade .7s ease .28s backwards;}
+  .land-btn{display:inline-flex; align-items:center; gap:9px; padding:16px 32px; border-radius:14px; font-weight:800; font-size:16px; cursor:pointer; border:none; transition:transform .2s, box-shadow .2s;}
+  .land-btn.primary{background:linear-gradient(135deg,#e8352c,#f3a847); color:#fff; box-shadow:0 14px 38px rgba(232,53,44,.45);}
+  .land-btn.ghost{background:rgba(255,255,255,.07); color:#fff; border:1px solid rgba(255,255,255,.22); backdrop-filter:blur(8px);}
+  .land-btn:hover{transform:translateY(-3px);}
+  .land-stats{display:flex; gap:34px; flex-wrap:wrap; justify-content:center; margin-top:42px; animation:landFade .7s ease .36s backwards;}
+  .land-stat b{display:block; font-family:'Sora',sans-serif; font-size:24px; font-weight:800; color:#febd69;}
+  .land-stat small{color:#9aa0b4; font-size:12px; letter-spacing:.3px;}
+  .land-hint{margin-top:34px; font-size:12px; color:#8a8f99; animation:scrollHint 1.8s ease-in-out infinite;}
+  @media(max-width:600px){ .land-btn{flex:1 1 100%; justify-content:center;} .land-stats{gap:22px;} }
 </style>
 </head>
 <body>
@@ -248,6 +273,27 @@
   </div>
   <div class="subnav" id="subnavCats"></div>
 </header>
+
+<section id="landingView">
+  <video id="landingVideo" autoplay muted loop playsinline></video>
+  <div class="land-veil"></div>
+  <div class="land-wrap">
+    <div class="land-logo">BROM<span>SHOP</span></div>
+    <div class="land-tag">⚡ Texnika, asbob va jihozlar — bir joyda</div>
+    <h1>Ishingni <em>kuchli</em> asbob bilan qil</h1>
+    <p>Benzopila, dori purkagich, isitgich va boshqa texnika. Kafolat bilan, 1–3 kunda manzilingizgacha yetkazib beramiz.</p>
+    <div class="land-cta">
+      <button class="land-btn primary" onclick="landingRegister()">Ro'yxatdan o'tish →</button>
+      <button class="land-btn ghost" onclick="enterStore()">Do'konni ko'rish</button>
+    </div>
+    <div class="land-stats">
+      <div class="land-stat"><b>1–3 kun</b><small>Yetkazib berish</small></div>
+      <div class="land-stat"><b>10%</b><small>Ko'p olsangiz chegirma</small></div>
+      <div class="land-stat"><b>24/7</b><small>Telegram orqali aloqa</small></div>
+    </div>
+    <div class="land-hint">↓ Ro'yxatdan o'tmasdan ham ko'rishingiz mumkin</div>
+  </div>
+</section>
 
 <main id="storeView">
   <section class="hero">
@@ -612,6 +658,31 @@ function renderGrid(){
 
 function fmt(n){ return n.toLocaleString('ru-RU').replace(/,/g,' '); }
 function normalizePhone(p){ return (p||'').replace(/\D/g,''); } // faqat raqamlarni qoldiradi — "+998 90 123-45-67" va "998901234567" bir xil deb hisoblanadi
+
+/* ---------- LANDING (kirish sahifasi) ---------- */
+function enterStore(){
+  const land = document.getElementById('landingView');
+  land.classList.remove('show');
+  document.body.style.overflow = '';
+  const lv = document.getElementById('landingVideo');
+  if(lv) lv.pause();
+}
+function landingRegister(){
+  enterStore();
+  openMyOrders();
+  if(!window.currentUser) switchProfileTab('register');
+}
+function initLanding(){
+  if(window.currentUser) return;   // faqat ro'yxatdan o'tmaganlarga — har safar ko'rsatiladi
+  const land = document.getElementById('landingView');
+  const hv = document.getElementById('heroVideo');
+  const lv = document.getElementById('landingVideo');
+  const src = hv && hv.querySelector('source');
+  if(src && lv) lv.src = src.src;   // bosh sahifadagi video qayta ishlatiladi
+  land.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  if(lv) lv.play().catch(()=>{});
+}
 
 /* ---------- AFZALLIK (perk) OYNASI ---------- */
 const PERKS = {
@@ -1343,6 +1414,7 @@ renderCats();
 renderGrid();
 updateCartUI();
 updateLogoutTabVisibility();
+initLanding();
 
 /* ---------- HERO BANNER: video → reklama rasmi → video (sikl) ---------- */
 (function heroCarousel(){
