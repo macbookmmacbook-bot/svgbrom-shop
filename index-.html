@@ -271,10 +271,10 @@
   </div></div>
 
   <div class="perks">
-    <div class="perk"><div class="pi">🚚</div><div><b>Tez yetkazish</b><small>Buyurtmangiz manzilingizgacha yetkaziladi</small></div></div>
-    <div class="perk"><div class="pi">🛡️</div><div><b>Kafolat</b><small>Mahsulotlarga kafolat beriladi</small></div></div>
-    <div class="perk"><div class="pi">💳</div><div><b>Qulay to'lov</b><small>Sizga qulay usulda to'lang</small></div></div>
-    <a class="perk" href="tel:+998335318494"><div class="pi">📞</div><div><b>Qo'llab-quvvatlash</b><small>+998 33 531 84 94</small></div></a>
+    <div class="perk" onclick="openPerk('delivery')" style="cursor:pointer;"><div class="pi">🚚</div><div><b>Tez yetkazish</b><small>1–3 kun ichida</small></div></div>
+    <div class="perk" onclick="openPerk('warranty')" style="cursor:pointer;"><div class="pi">🛡️</div><div><b>Kafolat</b><small>Batafsil ko'rish</small></div></div>
+    <div class="perk" onclick="openPerk('payment')" style="cursor:pointer;"><div class="pi">💳</div><div><b>Qulay to'lov</b><small>Batafsil ko'rish</small></div></div>
+    <div class="perk" onclick="openPerk('support')" style="cursor:pointer;"><div class="pi">📞</div><div><b>Qo'llab-quvvatlash</b><small>+998 33 531 84 94</small></div></div>
   </div>
 
   <div class="section-title"><h2>Mahsulotlar</h2></div>
@@ -438,7 +438,7 @@
 </section>
 
 <!-- CART DRAWER -->
-<div class="overlay" id="overlay" onclick="closeCart(); closeCheckout(); closeProductDetail();"></div>
+<div class="overlay" id="overlay" onclick="closeCart(); closeCheckout(); closeProductDetail(); closePerk();"></div>
 <div class="drawer" id="cartDrawer">
   <div class="drawer-head">
     <h3>Savat</h3>
@@ -446,7 +446,8 @@
   </div>
   <div class="drawer-body" id="cartBody"></div>
   <div class="drawer-foot" id="cartFoot" style="display:none">
-    <div class="total-row"><span>Jami:</span><span id="cartTotal">0 so'm</span></div>
+    <div id="cartSumRows"></div>
+    <div class="total-row" style="display:none;"><span>Jami:</span><span id="cartTotal">0 so'm</span></div>
     <button class="btn" style="width:100%; justify-content:center" onclick="openCheckout()">Buyurtma berish</button>
   </div>
 </div>
@@ -454,6 +455,11 @@
 <!-- MAHSULOT BATAFSIL MODAL -->
 <div class="modal" id="productModal">
   <div class="modal-box" id="productModalBox" style="max-width:460px;"></div>
+</div>
+
+<!-- PERK (afzallik) MODAL -->
+<div class="modal" id="perkModal">
+  <div class="modal-box" id="perkModalBox" style="max-width:380px; text-align:center;"></div>
 </div>
 
 <!-- CHECKOUT MODAL -->
@@ -526,7 +532,10 @@ const TG_BOT_USERNAME = "brom_shop_bot"; // @ belgisisiz, aniq va doimiy
 }
 
 async function sendTelegramOrder(order){
-  const itemsText = order.items.map(i => `• ${i.name} x${i.qty} — ${fmt(i.price*i.qty)} so'm`).join('\n');
+  const itemsText = order.items.map(i => {
+    const d = i.discountPct ? Math.round(i.price*i.qty*i.discountPct/100) : 0;
+    return `• ${i.name} x${i.qty} — ${fmt(i.price*i.qty - d)} so'm` + (i.discountPct ? ` (−${i.discountPct}%)` : '');
+  }).join('\n');
   const text =
 `🛍️ *YANGI BUYURTMA — BROM SHOP*
 
@@ -536,7 +545,7 @@ async function sendTelegramOrder(order){
 
 ${itemsText}
 
-💰 Jami: ${fmt(order.total)} so'm
+${order.discount>0 ? `🏷 Chegirma: −${fmt(order.discount)} so'm\n` : ''}💰 Jami: ${fmt(order.total)} so'm
 🕒 ${order.date}
 🔖 Buyurtma №${order.id}`;
 
@@ -604,6 +613,31 @@ function renderGrid(){
 function fmt(n){ return n.toLocaleString('ru-RU').replace(/,/g,' '); }
 function normalizePhone(p){ return (p||'').replace(/\D/g,''); } // faqat raqamlarni qoldiradi — "+998 90 123-45-67" va "998901234567" bir xil deb hisoblanadi
 
+/* ---------- AFZALLIK (perk) OYNASI ---------- */
+const PERKS = {
+  delivery: {icon:'🚚', title:'Tez yetkazib berish', text:"Buyurtmangiz <b>1 kundan 3 kungacha</b> manzilingizgacha yetkazib beriladi."},
+  warranty: {icon:'🛡️', title:'Kafolat', text:"Mahsulotlarga kafolat beriladi. Kafolat muddati har bir mahsulot tavsifida ko'rsatilgan (masalan, 1 oy yoki 3 oy)."},
+  payment:  {icon:'💳', title:"Qulay to'lov", text:"Buyurtma berganingizdan so'ng operator siz bilan bog'lanib, to'lov usulini kelishib oladi."},
+  support:  {icon:'📞', title:"Qo'llab-quvvatlash", text:"Savollaringiz bo'lsa, bizga qo'ng'iroq qiling yoki Telegramdan yozing.", extra:`
+    <a href="tel:+998335318494" class="btn" style="width:100%; justify-content:center; margin-top:14px;">📞 +998 33 531 84 94</a>
+    <a href="https://t.me/amirhonsh" target="_blank" class="btn ghost" style="width:100%; justify-content:center; margin-top:10px;">✈️ Telegram: @amirhonsh</a>`}
+};
+function openPerk(key){
+  const p = PERKS[key]; if(!p) return;
+  document.getElementById('perkModalBox').innerHTML = `
+    <div style="font-size:54px; margin-bottom:8px;">${p.icon}</div>
+    <h3 style="margin-bottom:10px;">${p.title}</h3>
+    <p style="color:var(--muted); font-size:15px; line-height:1.6;">${p.text}</p>
+    ${p.extra||''}
+    <button class="btn ghost" style="width:100%; justify-content:center; margin-top:16px;" onclick="closePerk()">Yopish</button>`;
+  document.getElementById('perkModal').classList.add('show');
+  document.getElementById('overlay').classList.add('show');
+}
+function closePerk(){
+  document.getElementById('perkModal').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+}
+
 /* ---------- MAHSULOT BATAFSIL ---------- */
 function openProductDetail(id){
   const p = PRODUCTS.find(x=>String(x.id)===String(id));
@@ -624,7 +658,8 @@ function openProductDetail(id){
     ` : `<div style="height:180px; display:flex; align-items:center; justify-content:center; font-size:72px; background:linear-gradient(160deg,#20242f,#171a22); border-radius:14px; margin-bottom:16px;">${p.em}</div>`}
     <h3 style="font-size:19px; margin-bottom:6px;">${p.name}</h3>
     <p style="color:var(--muted); font-size:14px; margin-bottom:14px;">${p.desc}</p>
-    <div class="price" style="font-size:22px; margin-bottom:18px;"><span class="promo-badge">Aksiya</span>${fmt(p.price)} so'm</div>
+    <div class="price" style="font-size:22px; margin-bottom:6px;"><span class="promo-badge">Aksiya</span>${fmt(p.price)} so'm</div>
+    <div style="font-size:12.5px; color:#067d62; font-weight:700; margin-bottom:16px;">🔥 3 ta olsangiz −5%, 6 ta olsangiz −10% chegirma</div>
     <div class="modal-actions">
       <button class="btn ghost" onclick="addToCart('${p.id}'); closeProductDetail();">🛒 Savatga</button>
       <button class="btn" onclick="buyNow('${p.id}')">Sotib olish</button>
@@ -675,11 +710,29 @@ function changeQty(id, delta){
   updateCartUI();
 }
 function cartCount(){ return Object.values(cart).reduce((a,b)=>a+b,0); }
-function cartTotalSum(){
+/* ---------- MIQDOR CHEGIRMASI: 3+ ta → 5%, 6+ ta → 10% (har bir mahsulot bo'yicha) ---------- */
+function discountPct(qty){ return qty>5 ? 10 : (qty>2 ? 5 : 0); }
+function lineDiscount(price, qty){ return Math.round(price*qty*discountPct(qty)/100); }
+function cartSubtotal(){
   return Object.entries(cart).reduce((sum,[id,qty])=>{
     const p = PRODUCTS.find(p=>p.id==id);
-    return sum + p.price*qty;
+    return sum + (p ? p.price*qty : 0);
   },0);
+}
+function cartDiscountSum(){
+  return Object.entries(cart).reduce((sum,[id,qty])=>{
+    const p = PRODUCTS.find(p=>p.id==id);
+    return sum + (p ? lineDiscount(p.price, qty) : 0);
+  },0);
+}
+function cartTotalSum(){ return cartSubtotal() - cartDiscountSum(); }
+function cartSummaryHTML(){
+  const sub = cartSubtotal(), disc = cartDiscountSum();
+  return `<div style="background:var(--bg2); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin:10px 0 14px; font-size:14px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="color:var(--muted)">Mahsulotlar summasi:</span><span>${fmt(sub)} so'm</span></div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:6px; color:${disc>0?'#067d62':'var(--muted)'};"><span>🔥 Chegirma:</span><b>${disc>0?'−':''}${fmt(disc)} so'm</b></div>
+    <div style="display:flex; justify-content:space-between; border-top:1px dashed var(--line); padding-top:8px; font-weight:800; font-size:16px;"><span>To'lash kerak:</span><span style="color:#e8352c">${fmt(sub-disc)} so'm</span></div>
+  </div>`;
 }
 function updateCartUI(){
   document.getElementById('cartBadge').textContent = cartCount();
@@ -699,14 +752,18 @@ function updateCartUI(){
       <div class="info">
         <b>${p.name}</b><br>
         <span class="p">${fmt(p.price)} so'm</span>
+        ${discountPct(qty)>0
+          ? `<div style="margin-top:4px;"><span class="promo-badge" style="margin:0;">Aksiya ${discountPct(qty)}%</span> <small style="color:#067d62; font-weight:700;">−${fmt(lineDiscount(p.price,qty))} so'm</small></div>`
+          : `<div style="margin-top:4px; font-size:11px; color:var(--muted);">${qty===2?'+1 ta qo\'shsangiz −5%':'3 tadan −5%, 6 tadan −10%'}</div>`}
       </div>
       <div class="qty">
-        <button onclick="changeQty(${id},-1)">−</button>
+        <button onclick="changeQty('${id}',-1)">−</button>
         <span>${qty}</span>
-        <button onclick="changeQty(${id},1)">+</button>
+        <button onclick="changeQty('${id}',1)">+</button>
       </div>
     </div>`;
   }).join('');
+  document.getElementById('cartSumRows').innerHTML = cartSummaryHTML();
   document.getElementById('cartTotal').textContent = fmt(cartTotalSum())+' so\'m';
 }
 
@@ -735,6 +792,7 @@ function openCheckout(){
     <div class="field"><label>Ism familiya</label><input id="custName" value="${window.currentUser.name}"></div>
     <div class="field"><label>Manzil</label><input id="custAddress" placeholder="Shahar, tuman, ko'cha"></div>
     <input type="hidden" id="custPin" value="${window.currentUser.pin}">
+    ${cartSummaryHTML()}
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeCheckout()">Bekor qilish</button>
       <button class="btn" onclick="submitOrder()">Tasdiqlash</button>
@@ -755,13 +813,13 @@ function submitOrder(){
   }
   const items = Object.entries(cart).map(([id,qty])=>{
     const p = PRODUCTS.find(p=>p.id==id);
-    return {name:p.name, qty, price:p.price};
+    return {name:p.name, qty, price:p.price, discountPct: discountPct(qty)};
   });
   const order = {
     id: 1000+orders.length+1,
     name, phone, phoneNorm: normalizePhone(phone), address, pin: pin||"0000",
     status: "Yangi",
-    items, total: cartTotalSum(),
+    items, subtotal: cartSubtotal(), discount: cartDiscountSum(), total: cartTotalSum(),
     date: new Date().toLocaleString('uz-UZ')
   };
   orders.unshift(order);
