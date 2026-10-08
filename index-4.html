@@ -572,7 +572,12 @@
       <div style="background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-weight:800; font-size:17px;">+998</div>
       <input id="moPhone" type="tel" placeholder="90 123 45 67" style="flex:1; padding:14px 16px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:17px; font-weight:700;">
     </div>
-    <button class="btn" id="loginSendBtn" style="width:100%; justify-content:center;" onclick="sendLoginCode()">📲 Telegramga kod yuborish</button>
+    <label style="font-size:13px; font-weight:700; color:var(--muted); display:block; margin-bottom:8px;">PIN kodingiz</label>
+    <input id="moPinDirect" type="password" inputmode="numeric" maxlength="4" placeholder="••••" onkeydown="if(event.key==='Enter') loginWithPin()" style="width:100%; padding:14px 16px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:20px; font-weight:800; letter-spacing:8px; margin-bottom:14px;">
+    <button class="btn" id="pinLoginBtn" style="width:100%; justify-content:center;" onclick="loginWithPin()">Kirish →</button>
+    <div id="pinLoginErr" style="color:var(--danger); font-size:13px; font-weight:700; margin-top:8px; text-align:center;"></div>
+    <div style="text-align:center; color:var(--muted); font-size:12.5px; margin:14px 0 8px;">— PIN esdan chiqdimi? —</div>
+    <button class="btn ghost" id="loginSendBtn" style="width:100%; justify-content:center;" onclick="sendLoginCode()">📲 Telegramga kod yuborish</button>
     <div id="loginCodeStep" style="display:none; margin-top:22px;">
       <label style="font-size:13px; font-weight:700; color:var(--muted); display:block; margin-bottom:8px;">Telegramga kelgan kod</label>
       <div class="pinboxes" id="moPinBoxes" style="display:flex; gap:10px; margin-bottom:16px;"></div>
@@ -590,9 +595,13 @@
       <input id="regPhone" type="tel" placeholder="90 123 45 67" style="flex:1; padding:14px 16px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:17px; font-weight:700;">
     </div>
     <div class="field"><label>Ismingiz</label><input id="regName" placeholder="Masalan: Aziz Karimov"></div>
-    <button class="btn" style="width:100%; justify-content:center; margin-top:8px;" onclick="startTelegramVerification()">📲 Telegram orqali tasdiqlash</button>
+    <div class="field"><label>4 xonali PIN o'ylab toping (kirishda kerak bo'ladi)</label><input id="regPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="letter-spacing:8px; font-size:20px; font-weight:800;"></div>
+    <button class="btn" id="regDirectBtn" style="width:100%; justify-content:center; margin-top:8px;" onclick="registerWithPin()">✅ Ro'yxatdan o'tish</button>
+    <div id="regErr" style="color:var(--danger); font-size:13px; font-weight:700; margin-top:8px; text-align:center;"></div>
+    <div style="text-align:center; color:var(--muted); font-size:12.5px; margin:14px 0 8px;">— yoki —</div>
+    <button class="btn ghost" style="width:100%; justify-content:center;" onclick="startTelegramVerification()">📲 Telegram orqali tasdiqlash</button>
 
-    <div style="margin-top:28px; padding:20px; background:var(--card); border:2px solid var(--gold); border-radius:18px; text-align:center;">
+    <div style="display:none; margin-top:28px; padding:20px; background:var(--card); border:2px solid var(--gold); border-radius:18px; text-align:center;">
       <div style="font-size:40px; margin-bottom:10px;">🤖✅</div>
       <div style="font-size:19px; font-weight:800; margin-bottom:10px;">QANDAY ISHLAYDI?</div>
       <div style="font-size:15px; line-height:1.9; text-align:left; margin-bottom:16px;">
@@ -820,9 +829,26 @@ window.orders = orders;
 const TG_BOT_TOKEN = "8903587459:AAHKvyU5aTxcFfpKPmhEUlisJZGJiUC-GAU";
 const TG_ADMIN_CHAT_ID = "6667031132";
 const TG_BOT_USERNAME = "brom_shop_bot"; // @ belgisisiz, aniq va doimiy
+/* ===== KOD BOTI — alohida bot, FAQAT ro'yxat/kirish kodlari va mijozga xabarlar uchun =====
+   @BotFather'da yangi bot oching va uning tokeni hamda nomini shu ikki qatorga yozing.
+   Bu tokenni boshqa hech qanday dastur (aiogram bot va h.k.) ishlatmasligi SHART. */
+const TG_CODE_BOT_TOKEN = "8866241636:AAGfhVmcfuuKbQqUrO_wJYNQL_6P87QUynk";
+const TG_CODE_BOT_USERNAME = "brom_kod_bot";   // bo'sh qolsa — Telegram'dan avtomatik olinadi
+const CODE_TOKEN = TG_CODE_BOT_TOKEN.includes(':') ? TG_CODE_BOT_TOKEN : TG_BOT_TOKEN;
+let CODE_BOT = CODE_TOKEN === TG_BOT_TOKEN ? TG_BOT_USERNAME : TG_CODE_BOT_USERNAME.replace('@','');
+// Kod botining nomini Telegram'dan o'zi so'rab oladi (getMe)
+const codeBotReady = (async ()=>{
+  if(CODE_BOT) return CODE_BOT;
+  try{ const r = await fetch(`https://api.telegram.org/bot${CODE_TOKEN}/getMe`); const d = await r.json(); if(d.ok) CODE_BOT = d.result.username; }catch(e){ console.error('getMe:', e); }
+  const pl = document.getElementById('preRegisterBotLink'); if(pl && CODE_BOT) pl.href = `https://t.me/${CODE_BOT}`;
+  return CODE_BOT;
+})();
+function randTag(){ return Math.random().toString(36).slice(2,10); }
+// Xabar aynan shu mijozdanmi? (deep-link: /start <tag>). Oddiy /start ham qabul qilinadi.
+function isMyStart(msg, tag){ const t = (msg && msg.text || '').trim(); return t === '/start ' + tag || t === '/start'; }
 {
   const preLink = document.getElementById('preRegisterBotLink');
-  if(preLink) preLink.href = `https://t.me/${TG_BOT_USERNAME}`;
+  if(preLink) preLink.href = `https://t.me/${CODE_BOT}`;
 }
 
 async function sendTelegramOrder(order){
@@ -1898,7 +1924,7 @@ async function notifyCustomer(order, status){
   const build = STATUS_MSG[status];
   if(!build) return false;
   try{
-    const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+    const r = await fetch(`https://api.telegram.org/bot${CODE_TOKEN}/sendMessage`, {
       method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({chat_id: order.telegramChatId, text: build(order)})
     });
@@ -2432,9 +2458,9 @@ function switchProfileTab(tab){
 /* ---------- TELEGRAM XATOSINI ANIQLASH (kod nega kelmayotganini ekranda ko'rsatadi) ---------- */
 function tgErrorText(d){
   const c = d && d.error_code, desc = (d && d.description) || '';
-  if(c === 401 || c === 404) return "⛔ Bot tokeni noto'g'ri yoki bekor qilingan. Saytdagi TG_BOT_TOKEN ni @BotFather bergan yangi tokenga almashtiring.";
+  if(c === 401 || c === 404) return "⛔ Bot tokeni noto'g'ri yoki bekor qilingan. Saytdagi TG_CODE_BOT_TOKEN ni tekshiring (kod boti tokeni).";
   if(c === 409 && /webhook/i.test(desc)) return "⛔ Botga webhook o'rnatilgan — sayt xabarlarni ololmaydi. Boshqa bot/serveringiz shu tokenni ishlatyapti.";
-  if(c === 409) return "⛔ Shu token bilan boshqa bot (masalan aiogram botingiz) ishlab turibdi — u xabarlarni o'zi olib qo'yyapti. Ikkalasi bir vaqtda ishlay olmaydi.";
+  if(c === 409) return "⛔ Kod botining tokenini boshqa dastur ham ishlatyapti. Kod boti uchun alohida, hech qayerda ishlatilmagan bot kerak.";
   return "⛔ Telegram xatosi: " + (desc || "internet yoki ulanish muammosi");
 }
 function showTgError(boxId, d, timerName){
@@ -2443,6 +2469,55 @@ function showTgError(boxId, d, timerName){
   console.error("Telegram:", d);
   if(timerName === 'verify') clearInterval(verifyPollTimer);
   if(timerName === 'login') clearInterval(loginPollTimer);
+}
+
+/* ---------- PIN BILAN RO'YXAT VA KIRISH (Telegram botga bog'liq emas) ---------- */
+async function pinHashOf(phoneNorm, pin){ return sha256Hex('brom:' + phoneNorm + ':' + pin); }
+function finishLogin(user){
+  window.currentUser = user;
+  localStorage.setItem('bromUser', JSON.stringify(user));
+  updateLogoutTabVisibility();
+  if(pendingCheckout){ pendingCheckout = false; openCheckout(); return; }
+  openMyOrders();
+}
+async function registerWithPin(){
+  const err = document.getElementById('regErr'); err.textContent = '';
+  const name = document.getElementById('regName').value.trim();
+  const local = document.getElementById('regPhone').value.replace(/\D/g,'').replace(/^998/,'');
+  const pin = document.getElementById('regPin').value.trim();
+  if(name.length < 2){ err.textContent = "Ismingizni yozing"; return; }
+  if(local.length !== 9){ err.textContent = "Telefon raqamni to'liq yozing (9 ta raqam, masalan 90 123 45 67)"; return; }
+  if(!/^\d{4}$/.test(pin)){ err.textContent = "PIN 4 ta raqamdan iborat bo'lsin"; return; }
+  const phone = "+998" + local, phoneNorm = normalizePhone(phone);
+  const btn = document.getElementById('regDirectBtn'); btn.disabled = true; btn.textContent = "Saqlanmoqda...";
+  try{
+    if(window.FB){
+      const existing = await window.FB.getUser(phoneNorm);
+      if(existing){ err.textContent = "Bu raqam allaqachon ro'yxatdan o'tgan. «Kirish» bo'limidan kiring."; return; }
+    }
+    const pinHash = await pinHashOf(phoneNorm, pin);
+    if(window.FB) await window.FB.registerUser({name, phone, phoneNorm, pinHash});
+    alert("Ro'yxatdan muvaffaqiyatli o'tdingiz! ✅");
+    finishLogin({name, phone, phoneNorm, telegramChatId:""});
+  }catch(e){ console.error(e); err.textContent = "Saqlanmadi. Internetni tekshirib, qayta urinib ko'ring."; }
+  finally{ btn.disabled = false; btn.textContent = "✅ Ro'yxatdan o'tish"; }
+}
+async function loginWithPin(){
+  const err = document.getElementById('pinLoginErr'); err.textContent = '';
+  const local = document.getElementById('moPhone').value.replace(/\D/g,'').replace(/^998/,'');
+  const pin = document.getElementById('moPinDirect').value.trim();
+  if(local.length !== 9){ err.textContent = "Telefon raqamni to'liq yozing"; return; }
+  if(!/^\d{4}$/.test(pin)){ err.textContent = "4 xonali PIN ni yozing"; return; }
+  const phone = "+998" + local, phoneNorm = normalizePhone(phone);
+  const btn = document.getElementById('pinLoginBtn'); btn.disabled = true;
+  try{
+    const profile = window.FB ? await window.FB.getUser(phoneNorm) : null;
+    if(!profile){ err.innerHTML = `Bu raqam bilan profil topilmadi. <a href="#" onclick="switchProfileTab('register'); return false;" style="color:var(--gold2)">Ro'yxatdan o'tish</a>`; return; }
+    if(!profile.pinHash){ err.textContent = "Bu profil Telegram orqali ochilgan — pastdagi «Telegramga kod yuborish» tugmasidan kiring."; return; }
+    if(await pinHashOf(phoneNorm, pin) !== profile.pinHash){ err.textContent = "PIN noto'g'ri"; return; }
+    finishLogin({name: profile.name, phone: profile.phone || phone, phoneNorm, telegramChatId: profile.telegramChatId || ""});
+  }catch(e){ console.error(e); err.textContent = "Ulanishda xatolik, qayta urinib ko'ring."; }
+  finally{ btn.disabled = false; }
 }
 let verifyPollTimer = null;
 let verifyPollOffset = 0;
@@ -2459,17 +2534,18 @@ async function startTelegramVerification(){
     if(existing){ alert("Bu telefon raqami bilan profil allaqachon mavjud. \"Kirish\" tabidan kiring."); return; }
   }
 
-  verifyPendingData = {name, phone, phoneNorm};
+  await codeBotReady;
+  verifyPendingData = {name, phone, phoneNorm, tag: randTag()};
 
   document.getElementById('registerBox').style.display = 'none';
   document.getElementById('verifyBox').style.display = 'block';
   document.getElementById('verifyStep1').style.display = 'block';
   document.getElementById('verifyStep2').style.display = 'none';
-  document.getElementById('verifyBotLink').href = `https://t.me/${TG_BOT_USERNAME}`;
+  document.getElementById('verifyBotLink').href = `https://t.me/${CODE_BOT}?start=${verifyPendingData.tag}`;
 
   // Eski xabarlarni o'tkazib yuborish uchun hozirgi oxirgi update_id'ni olamiz
   try{
-    const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?limit=1&offset=-1`);
+    const r = await fetch(`https://api.telegram.org/bot${CODE_TOKEN}/getUpdates?limit=1&offset=-1`);
     const d = await r.json();
     if(!d.ok){ showTgError('verifyStatus', d, 'verify'); return; }
     if(d.result.length) verifyPollOffset = d.result[0].update_id + 1;
@@ -2483,20 +2559,20 @@ async function startTelegramVerification(){
 async function pollForBotStart(){
   if(!verifyPendingData) return;
   try{
-    const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?offset=${verifyPollOffset}&timeout=0`);
+    const r = await fetch(`https://api.telegram.org/bot${CODE_TOKEN}/getUpdates?offset=${verifyPollOffset}&timeout=0`);
     const d = await r.json();
     if(!d.ok){ showTgError('verifyStatus', d, 'verify'); return; }
     for(const upd of d.result){
       verifyPollOffset = upd.update_id + 1;
       const msg = upd.message;
-      if(!msg) continue;
+      if(!msg || !isMyStart(msg, verifyPendingData.tag)) continue;
       // Birinchi kelgan xabar (odatda /start) — shu odamga kod yuboramiz
       clearInterval(verifyPollTimer);
       const code = String(Math.floor(1000 + Math.random()*9000));
       verifyPendingData.verifyCode = code;
       verifyPendingData.telegramChatId = String(msg.chat.id);
       try{
-        await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+        await fetch(`https://api.telegram.org/bot${CODE_TOKEN}/sendMessage`, {
           method: "POST",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({ chat_id: msg.chat.id, text: `🔐 BROM SHOP tasdiqlovchi kodingiz:\n\n${code}\n\nShu kodni saytga kiriting.` })
@@ -2640,22 +2716,22 @@ async function sendLoginCode(){
     return;
   }
   const code = String(Math.floor(1000 + Math.random()*9000));
-  loginPending = {phone, phoneNorm, profile, code};
+  await codeBotReady;
+  loginPending = {phone, phoneNorm, profile, code, tag: randTag()};
 
   if(profile.telegramChatId){
     const ok = await sendTelegramCode(profile.telegramChatId, code);
     if(ok){
       statusBox.textContent = "✅ Kod Telegramga yuborildi";
       showLoginCodeStep();
-    } else {
-      statusBox.textContent = "Kod yuborilmadi. Botni ochib, /start bosing va qayta urining.";
+      return;
     }
-    return;
+    // eski botda ulangan bo'lishi mumkin — yangi botga Start bosishini kutamiz
   }
   // Telegram hali ulanmagan — botga /start bosishini kutamiz
-  statusBox.innerHTML = `Botni oching va <b>Start</b> bosing: <a href="https://t.me/${TG_BOT_USERNAME}" target="_blank" style="color:var(--gold); font-weight:700;">@${TG_BOT_USERNAME}</a><br><span style="font-size:12px;">Kutilmoqda...</span>`;
+  statusBox.innerHTML = `Botni oching va <b>Start</b> bosing: <a href="https://t.me/${CODE_BOT}?start=${loginPending.tag}" target="_blank" style="color:var(--gold); font-weight:700;">@${CODE_BOT}</a><br><span style="font-size:12px;">Kutilmoqda...</span>`;
   try{
-    const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?limit=1&offset=-1`);
+    const r = await fetch(`https://api.telegram.org/bot${CODE_TOKEN}/getUpdates?limit=1&offset=-1`);
     const d = await r.json();
     if(!d.ok){ showTgError('loginStatus', d, 'login'); return; }
     if(d.result.length) verifyPollOffset = d.result[0].update_id + 1;
@@ -2667,12 +2743,12 @@ async function sendLoginCode(){
 async function pollLoginStart(){
   if(!loginPending) return;
   try{
-    const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?offset=${verifyPollOffset}&timeout=0`);
+    const r = await fetch(`https://api.telegram.org/bot${CODE_TOKEN}/getUpdates?offset=${verifyPollOffset}&timeout=0`);
     const d = await r.json();
     if(!d.ok){ showTgError('loginStatus', d, 'login'); return; }
     for(const upd of d.result){
       verifyPollOffset = upd.update_id + 1;
-      if(!upd.message) continue;
+      if(!upd.message || !isMyStart(upd.message, loginPending.tag)) continue;
       clearInterval(loginPollTimer);
       const chatId = String(upd.message.chat.id);
       loginPending.profile.telegramChatId = chatId;
@@ -2687,7 +2763,7 @@ async function pollLoginStart(){
 
 async function sendTelegramCode(chatId, code){
   try{
-    const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+    const r = await fetch(`https://api.telegram.org/bot${CODE_TOKEN}/sendMessage`, {
       method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({chat_id: chatId, text:`🔐 BROM SHOP kirish kodi:\n\n${code}\n\nShu kodni saytga kiriting.`})
     });
