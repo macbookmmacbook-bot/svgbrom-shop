@@ -2428,6 +2428,22 @@ function switchProfileTab(tab){
   document.getElementById('registerBox').style.display = tab==='register' ? 'block' : 'none';
   document.getElementById('myOrdersResult').innerHTML = '';
 }
+
+/* ---------- TELEGRAM XATOSINI ANIQLASH (kod nega kelmayotganini ekranda ko'rsatadi) ---------- */
+function tgErrorText(d){
+  const c = d && d.error_code, desc = (d && d.description) || '';
+  if(c === 401 || c === 404) return "⛔ Bot tokeni noto'g'ri yoki bekor qilingan. Saytdagi TG_BOT_TOKEN ni @BotFather bergan yangi tokenga almashtiring.";
+  if(c === 409 && /webhook/i.test(desc)) return "⛔ Botga webhook o'rnatilgan — sayt xabarlarni ololmaydi. Boshqa bot/serveringiz shu tokenni ishlatyapti.";
+  if(c === 409) return "⛔ Shu token bilan boshqa bot (masalan aiogram botingiz) ishlab turibdi — u xabarlarni o'zi olib qo'yyapti. Ikkalasi bir vaqtda ishlay olmaydi.";
+  return "⛔ Telegram xatosi: " + (desc || "internet yoki ulanish muammosi");
+}
+function showTgError(boxId, d, timerName){
+  const box = document.getElementById(boxId);
+  if(box){ box.innerHTML = `<span style="color:var(--danger); font-weight:700;">${tgErrorText(d)}</span><br><span style="font-size:12px;">Hozircha operator orqali: <a href="tel:+998335318494" style="color:var(--gold2)">+998 33 531 84 94</a></span>`; box.style.display = 'block'; }
+  console.error("Telegram:", d);
+  if(timerName === 'verify') clearInterval(verifyPollTimer);
+  if(timerName === 'login') clearInterval(loginPollTimer);
+}
 let verifyPollTimer = null;
 let verifyPollOffset = 0;
 let verifyPendingData = null;
@@ -2455,8 +2471,9 @@ async function startTelegramVerification(){
   try{
     const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?limit=1&offset=-1`);
     const d = await r.json();
-    if(d.ok && d.result.length) verifyPollOffset = d.result[0].update_id + 1;
-  }catch(e){}
+    if(!d.ok){ showTgError('verifyStatus', d, 'verify'); return; }
+    if(d.result.length) verifyPollOffset = d.result[0].update_id + 1;
+  }catch(e){ showTgError('verifyStatus', null, 'verify'); return; }
 
   clearInterval(verifyPollTimer);
   verifyPollTimer = setInterval(pollForBotStart, 2000);
@@ -2468,7 +2485,7 @@ async function pollForBotStart(){
   try{
     const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?offset=${verifyPollOffset}&timeout=0`);
     const d = await r.json();
-    if(!d.ok) return;
+    if(!d.ok){ showTgError('verifyStatus', d, 'verify'); return; }
     for(const upd of d.result){
       verifyPollOffset = upd.update_id + 1;
       const msg = upd.message;
@@ -2640,8 +2657,9 @@ async function sendLoginCode(){
   try{
     const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?limit=1&offset=-1`);
     const d = await r.json();
-    if(d.ok && d.result.length) verifyPollOffset = d.result[0].update_id + 1;
-  }catch(e){}
+    if(!d.ok){ showTgError('loginStatus', d, 'login'); return; }
+    if(d.result.length) verifyPollOffset = d.result[0].update_id + 1;
+  }catch(e){ showTgError('loginStatus', null, 'login'); return; }
   clearInterval(loginPollTimer);
   loginPollTimer = setInterval(pollLoginStart, 2000);
 }
@@ -2651,7 +2669,7 @@ async function pollLoginStart(){
   try{
     const r = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?offset=${verifyPollOffset}&timeout=0`);
     const d = await r.json();
-    if(!d.ok) return;
+    if(!d.ok){ showTgError('loginStatus', d, 'login'); return; }
     for(const upd of d.result){
       verifyPollOffset = upd.update_id + 1;
       if(!upd.message) continue;
