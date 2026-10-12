@@ -510,8 +510,12 @@
   .land-stats{display:grid; grid-template-columns:repeat(3,auto); justify-content:center;}
   /* pastki menyu — faqat telefon va planshetda */
   @media(min-width:821px){
-    .bottom-tabbar{display:none !important;}
-    body{padding-bottom:0 !important;}
+    .bottom-tabbar{left:50% !important; right:auto !important; transform:translateX(-50%); bottom:14px !important; width:min(560px, calc(100% - 40px)); border-radius:20px !important; padding:6px 8px !important; background:rgba(19,25,33,.94) !important; backdrop-filter:blur(14px); box-shadow:0 18px 40px -12px rgba(0,0,0,.45) !important;}
+    .bottom-tabbar .tab-item{padding:4px 10px !important;}
+    .bottom-tabbar .tab-pill{top:3px !important; height:calc(100% - 6px) !important; width:64px !important; margin-left:-3px !important; border-radius:14px !important; background:rgba(254,189,105,.16) !important; border:none !important; box-shadow:none !important;}
+    .bottom-tabbar .tab-pill::before,.bottom-tabbar .tab-pill::after{display:none !important;}
+    .bottom-tabbar .tab-item.active span{transform:none !important; animation:none !important;}
+    body{padding-bottom:92px !important;}
     footer{padding-bottom:26px !important;}
     .chat-fab{bottom:24px;}
     .usta-hint{bottom:36px;}
