@@ -993,6 +993,8 @@
   @keyframes agShake{0%,100%{transform:none;}20%,60%{transform:translateX(-6px);}40%,80%{transform:translateX(6px);}}
   .btn.btn-dim{opacity:.5;}
   @media(max-width:600px){ .inst-line{font-size:10px; padding:1px 6px;} .terms{max-height:150px;} }
+
+  body:not(.srv-on) .tg-only{display:none !important;}
 </style>
 </head>
 <body>
@@ -1290,8 +1292,8 @@ function favIcon(on){ return on ? icon('heart','ic ic-heart on','currentColor') 
     <input id="moPinDirect" type="password" inputmode="numeric" maxlength="4" placeholder="••••" onkeydown="if(event.key==='Enter') loginWithPin()" style="width:100%; padding:14px 16px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:20px; font-weight:800; letter-spacing:8px; margin-bottom:14px;">
     <button class="btn" id="pinLoginBtn" style="width:100%; justify-content:center;" onclick="loginWithPin()">Kirish →</button>
     <div id="pinLoginErr" style="color:var(--danger); font-size:13px; font-weight:700; margin-top:8px; text-align:center;"></div>
-    <div style="text-align:center; color:var(--muted); font-size:12.5px; margin:14px 0 8px;">— PIN esdan chiqdimi? —</div>
-    <button class="btn ghost" id="loginSendBtn" style="width:100%; justify-content:center;" onclick="sendLoginCode()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg> Telegramga kod yuborish</button>
+    <div class="tg-only" style="text-align:center; color:var(--muted); font-size:12.5px; margin:14px 0 8px;">— PIN esdan chiqdimi? —</div>
+    <button class="btn ghost tg-only" id="loginSendBtn" style="width:100%; justify-content:center;" onclick="sendLoginCode()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg> Telegramga kod yuborish</button>
     <div id="loginCodeStep" style="display:none; margin-top:22px;">
       <label style="font-size:13px; font-weight:700; color:var(--muted); display:block; margin-bottom:8px;">Telegramga kelgan kod</label>
       <div class="pinboxes" id="moPinBoxes" style="display:flex; gap:10px; margin-bottom:16px;"></div>
@@ -1312,8 +1314,8 @@ function favIcon(on){ return on ? icon('heart','ic ic-heart on','currentColor') 
     <div class="field"><label>4 xonali PIN o'ylab toping (kirishda kerak bo'ladi)</label><input id="regPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="letter-spacing:8px; font-size:20px; font-weight:800;"></div>
     <button class="btn" id="regDirectBtn" style="width:100%; justify-content:center; margin-top:8px;" onclick="registerWithPin()">✅ Ro'yxatdan o'tish</button>
     <div id="regErr" style="color:var(--danger); font-size:13px; font-weight:700; margin-top:8px; text-align:center;"></div>
-    <div style="text-align:center; color:var(--muted); font-size:12.5px; margin:14px 0 8px;">— yoki —</div>
-    <button class="btn ghost" style="width:100%; justify-content:center;" onclick="startTelegramVerification()">📲 Telegram orqali tasdiqlash</button>
+    <div class="tg-only" style="text-align:center; color:var(--muted); font-size:12.5px; margin:14px 0 8px;">— yoki —</div>
+    <button class="btn ghost tg-only" style="width:100%; justify-content:center;" onclick="startTelegramVerification()">📲 Telegram orqali tasdiqlash</button>
 
     <div style="display:none; margin-top:28px; padding:20px; background:var(--card); border:2px solid var(--gold); border-radius:18px; text-align:center;">
       <div style="font-size:40px; margin-bottom:10px;">🤖✅</div>
@@ -4120,6 +4122,21 @@ if("serviceWorker" in navigator){
     navigator.serviceWorker.register("service-worker.js").catch(e => console.log("SW ro'yxatdan o'tmadi:", e));
   });
 }
+</script>
+<script>
+/* Server bormi? Bor bo'lsa Telegram orqali kirish tugmalari ko'rinadi, yo'q bo'lsa faqat PIN. */
+(function(){
+  let tries = 0;
+  const t = setInterval(async function(){
+    if(!window.FB_CALL){ if(++tries > 40) clearInterval(t); return; }
+    clearInterval(t);
+    try{ await window.FB_CALL('me', {}); document.body.classList.add('srv-on'); }
+    catch(e){
+      const c = (e && e.code) || '';
+      if(!/functions\/(internal|not-found|unavailable|deadline-exceeded)/.test(c)) document.body.classList.add('srv-on');
+    }
+  }, 500);
+})();
 </script>
 </body>
 </html>
