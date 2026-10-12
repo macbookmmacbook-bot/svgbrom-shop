@@ -994,7 +994,7 @@
   .btn.btn-dim{opacity:.5;}
   @media(max-width:600px){ .inst-line{font-size:10px; padding:1px 6px;} .terms{max-height:150px;} }
 
-  body:not(.srv-on) .tg-only{display:none !important;}
+  
 </style>
 </head>
 <body>
@@ -1637,8 +1637,8 @@ const LOCAL_API = {
     if(await sha256hex('brom:'+p+':'+pin) !== u.pinHash) localErr("PIN noto'g'ri");
     return localUser({...u, phoneNorm: p});
   },
-  async tgStart(){ localErr("Telegram orqali kirish server yuklangach ishlaydi. Hozircha PIN bilan kiring."); },
-  async tgVerify(){ localErr("Telegram orqali kirish server yuklangach ishlaydi."); },
+  async tgStart(){ const e = new Error(''); e.code = 'local/no-tg'; throw e; },
+  async tgVerify(){ const e = new Error(''); e.code = 'local/no-tg'; throw e; },
   async logout(){ return {ok:true}; },
   async me(){
     const u = window.currentUser; if(!u) localErr("Iltimos, qaytadan kiring");
@@ -1687,6 +1687,84 @@ const LOCAL_API = {
     await window.FB.raw.set('sellerRequests', 'S' + Date.now(), { name: localClean(d.name,60), phone: localClean(d.phone,20), products: (d.products||[]).slice(0,3), at: Date.now() });
     return {ok:true};
   }
+};
+
+/* ---------- LOKAL TELEGRAM (faqat shu faylda; internetga qo'ymang) ---------- */
+const LTG = { shop: "8903587459:AAHKvyU5aTxcFfpKPmhEUlisJZGJiUC-GAU", code: "8866241636:AAGfhVmcfuuKbQqUrO_wJYNQL_6P87QUynk", bot: "brom_kod_bot", admin: "6667031132" };
+const ltgPending = {}; let ltgOffset = 0;
+async function ltgCall(tok, m, body){
+  const r = await fetch(`https://api.telegram.org/bot${tok}/${m}`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body||{})});
+  const d = await r.json();
+  if(!d.ok){
+    if(d.error_code === 409){ try{ await fetch(`https://api.telegram.org/bot${tok}/deleteWebhook`); }catch(e){} }
+    if(d.error_code === 401 || d.error_code === 404) throw new Error("Bot tokeni bekor qilingan — faylni yangi token bilan qayta yasash kerak");
+    throw new Error(d.description || 'Telegram xatosi');
+  }
+  return d.result;
+}
+function ltgCode(){ return String(Math.floor(1000 + Math.random()*9000)); }
+async function ltgPoll(tag){
+  const end = Date.now() + 5*60*1000;
+  while(ltgPending[tag] && !ltgPending[tag].code && Date.now() < end){
+    try{
+      const ups = await ltgCall(LTG.code, 'getUpdates', {offset: ltgOffset, timeout: 0});
+      for(const u of ups){
+        ltgOffset = u.update_id + 1;
+        const m = u.message; if(!m || !m.text) continue;
+        const mt = m.text.trim().match(/^\/start\s+(\S+)/); if(!mt) continue;
+        const q = ltgPending[mt[1]]; if(!q || q.code) continue;
+        q.chatId = String(m.chat.id); q.code = ltgCode();
+        await ltgCall(LTG.code, 'sendMessage', {chat_id: m.chat.id, text: `🔐 BROM SHOP tasdiqlovchi kodingiz:\n\n${q.code}\n\nShu kodni saytga kiriting.`});
+      }
+    }catch(e){ console.warn('Telegram:', e.message); }
+    await new Promise(r=>setTimeout(r, 2000));
+  }
+}
+LOCAL_API.tgStart = async function(d){
+  const p = localPhoneNorm(d.phone);
+  const tag = Array.from({length:12}, ()=>'abcdefghijkmnpqrstuvwxyz23456789'[Math.floor(Math.random()*32)]).join('');
+  const u = await window.FB.raw.get('users', p);
+  if(d.mode === 'login'){
+    if(!u) localErr("Bu raqam bilan profil topilmadi. Avval ro'yxatdan o'ting.");
+    if(!u.telegramChatId) localErr("Bu profil Telegram'ga ulanmagan. PIN bilan kiring.");
+    const q = ltgPending[tag] = {mode:'login', phone:p, chatId:String(u.telegramChatId), code: ltgCode(), tries:0};
+    await ltgCall(LTG.code, 'sendMessage', {chat_id: q.chatId, text: `🔐 BROM SHOP kirish kodi:\n\n${q.code}\n\nShu kodni saytga kiriting.`});
+    return {tag, bot: LTG.bot};
+  }
+  const name = localClean(d.name, 60); if(name.length < 2) localErr("Ismingizni yozing");
+  if(u) localErr("Bu raqam allaqachon ro'yxatdan o'tgan. «Kirish» bo'limidan kiring.");
+  ltgPending[tag] = {mode:'register', name, phone:p, tries:0};
+  ltgPoll(tag);
+  return {tag, bot: LTG.bot};
+};
+LOCAL_API.tgVerify = async function(d){
+  const q = ltgPending[d.tag]; if(!q) localErr("Vaqt tugadi, qaytadan boshlang");
+  if(!q.code) localErr("Avval botni ochib «Start» bosing");
+  if(String(d.code) !== q.code){ if(++q.tries >= 5) delete ltgPending[d.tag]; localErr("Kod noto'g'ri"); }
+  delete ltgPending[d.tag];
+  if(q.mode === 'login'){ const u = await window.FB.raw.get('users', q.phone); return localUser({...u, phoneNorm: q.phone}); }
+  const u = { name: q.name, phone: '+'+q.phone, phoneNorm: q.phone, telegramChatId: q.chatId, pinHash: '', createdAt: Date.now() };
+  await window.FB.raw.set('users', q.phone, u);
+  return localUser(u);
+};
+const _ltgOrder = LOCAL_API.placeOrder;
+LOCAL_API.placeOrder = async function(d){
+  const r = await _ltgOrder(d), o = r.order;
+  try{
+    await ltgCall(LTG.shop, 'sendMessage', {chat_id: LTG.admin, text:
+      `🛒 YANGI BUYURTMA №${o.id}\n\n👤 ${o.name}\n📞 ${o.phone}\n📍 ${o.region}, ${o.address}\n\n` +
+      o.items.map(i=>`• ${i.name} × ${i.qty}`).join('\n') +
+      `\n\n🚚 Yetkazish: ${o.delivery ? fmt(o.delivery)+" so'm" : 'bepul'}\n💰 Jami: ${fmt(o.total)} so'm` +
+      (o.payment==='installment' ? `\n💳 Bo'lib to'lash (${o.bank}): ${o.months} oy × ${fmt(o.monthly)} so'm` : `\n💵 Naqd / karta`) +
+      `\n✅ Mijoz xarid shartlariga rozi bo'ldi`});
+  }catch(e){ console.warn('Admin xabari:', e.message); }
+  return r;
+};
+const _ltgCancel = LOCAL_API.cancelMyOrder;
+LOCAL_API.cancelMyOrder = async function(d){
+  const r = await _ltgCancel(d), u = window.currentUser || {};
+  try{ await ltgCall(LTG.shop, 'sendMessage', {chat_id: LTG.admin, text: `❌ Mijoz buyurtmani BEKOR QILDI\n\n🔖 №${d.orderId}\n👤 ${u.name||''}\n📞 ${u.phone||''}`}); }catch(e){}
+  return r;
 };
 
 function setSession(res){
@@ -3667,7 +3745,7 @@ async function startTelegramVerification(){
   if(name.length < 2 || local.length !== 9){ alert("Ism va telefon raqamingizni to'liq kiriting"); return; }
   let r;
   try{ r = await api('tgStart', {mode:'register', name, phone: "+998" + local}); }
-  catch(e){ alert(e.message); return; }
+  catch(e){ if(e && e.code === 'local/no-tg'){ document.body.classList.remove('srv-on'); const f = document.getElementById('regPin'); if(f) f.focus(); return; } alert(e.message); return; }
   verifyPendingData = {tag: r.tag};
   document.getElementById('registerBox').style.display = 'none';
   document.getElementById('verifyBox').style.display = 'block';
@@ -3782,6 +3860,7 @@ async function sendLoginCode(){
     statusBox.textContent = "✅ Kod Telegramga yuborildi";
     showLoginCodeStep();
   }catch(e){
+    if(e && e.code === 'local/no-tg'){ statusBox.textContent = ''; document.body.classList.remove('srv-on'); const f = document.getElementById('moPinDirect'); if(f) f.focus(); return; }
     statusBox.innerHTML = `<span style="color:var(--danger); font-weight:700;">${escH(e.message)}</span>`;
   }
 }
