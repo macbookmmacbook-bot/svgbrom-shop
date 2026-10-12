@@ -964,6 +964,35 @@
     body:has(.drawer.show){overflow:hidden;}
     .drawer-foot{border-radius:0 !important;}
   }
+
+  /* ================= BO'LIB TO'LASH VA SHARTLAR ================= */
+  .inst-line{font-size:11.5px; color:#b27a16; background:rgba(254,189,105,.18); border-radius:7px; padding:2px 7px; width:max-content; max-width:100%; margin-top:2px;}
+  .inst-line b{font-weight:800;}
+  .pd-inst{margin-top:12px; padding:12px; border-radius:14px; background:rgba(254,189,105,.12); border:1px dashed rgba(243,168,71,.6);}
+  .pd-inst-h{font-weight:800; font-size:13.5px; margin-bottom:8px;}
+  .pd-inst small{display:block; margin-top:8px; font-size:11.5px; color:var(--muted); line-height:1.4;}
+  .inst-chips{display:grid; grid-template-columns:repeat(3,1fr); gap:6px;}
+  .inst-chip{display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 4px; border-radius:11px; border:2px solid var(--line); background:var(--card); cursor:pointer; font-family:inherit; color:var(--text);}
+  .inst-chip b{font-size:13px;} .inst-chip span{font-size:11.5px; color:var(--muted); font-weight:700;}
+  .inst-chip.on{border-color:var(--gold2); background:rgba(254,189,105,.15);}
+  .inst-sum{font-size:12.5px; margin-top:8px; color:var(--muted);}
+  .inst-sum b{color:var(--text);}
+  .pay-opts{display:flex; flex-direction:column; gap:8px;}
+  .pay-opt{display:flex; align-items:center; gap:10px; padding:11px 12px; border:2px solid var(--line); border-radius:13px; cursor:pointer; background:var(--bg);}
+  .pay-opt:has(input:checked){border-color:var(--gold2); background:rgba(254,189,105,.1);}
+  .pay-opt input{width:18px; height:18px; accent-color:var(--gold2); flex:0 0 auto;}
+  .pay-opt b{display:block; font-size:14px;} .pay-opt small{display:block; font-size:12px; color:var(--muted);}
+  #instBox{margin-top:10px;}
+  .terms{max-height:190px; overflow-y:auto; font-size:12px; line-height:1.5; color:var(--muted); background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:6px 0 10px;}
+  .terms-h{font-weight:800; color:var(--text); font-size:12.5px; margin:2px 0 4px;}
+  .terms-h.warn{color:#d4380d; margin-top:10px;}
+  .terms ol{padding-left:18px; margin:0;} .terms li{margin:3px 0;}
+  .agree{display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-radius:12px; background:rgba(6,125,98,.08); cursor:pointer; font-size:13.5px; margin-bottom:12px;}
+  .agree input{width:20px; height:20px; accent-color:#067d62; flex:0 0 auto; margin-top:1px;}
+  .agree.shake{animation:agShake .45s ease; background:rgba(232,53,44,.12);}
+  @keyframes agShake{0%,100%{transform:none;}20%,60%{transform:translateX(-6px);}40%,80%{transform:translateX(6px);}}
+  .btn.btn-dim{opacity:.5;}
+  @media(max-width:600px){ .inst-line{font-size:10px; padding:1px 6px;} .terms{max-height:150px;} }
 </style>
 </head>
 <body>
@@ -994,6 +1023,61 @@
 </header>
 
 <div id="splash" aria-hidden="true"><div class="sp-ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/></svg></div><div class="sp-logo">BROM<span>SHOP</span></div><div class="sp-tag">Kuchli asboblar — tez yetkazib berish</div></div>
+<script>
+/* ---------- BO'LIB TO'LASH SOZLAMALARI ----------
+   Foizlarni Infinbank bilan kelishilgan haqiqiy qiymatlarga almashtiring (pct — umumiy ustama, %).
+   Bir xil jadval serverda ham bor (functions/index.js → INSTALL). */
+var INSTALL = { enabled: true, bank: 'Infinbank', plans: [ {m:3, pct:0}, {m:6, pct:0}, {m:12, pct:0} ], minTotal: 300000 };
+function instMonthly(total, m){ const pl = INSTALL.plans.find(x=>x.m===m) || INSTALL.plans[INSTALL.plans.length-1]; return Math.ceil(total * (1 + pl.pct/100) / pl.m / 100) * 100; }
+function instTotal(total, m){ const pl = INSTALL.plans.find(x=>x.m===m) || INSTALL.plans[INSTALL.plans.length-1]; return Math.round(total * (1 + pl.pct/100)); }
+function instMin(price){ const m = INSTALL.plans[INSTALL.plans.length-1].m; return instMonthly(price, m); }
+function instAllowed(total){ return !!INSTALL.enabled && total >= INSTALL.minTotal; }
+function catScroll(){
+  setTimeout(()=>{ const el = document.getElementById('catalogTop'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }, 60);
+}
+var TERMS_GENERAL = [
+  "Buyurtma operator qo'ng'irog'i bilan tasdiqlanadi. Narx va mavjudlik tasdiqlangandan keyin qat'iy bo'ladi.",
+  "Yetkazib berish 1–3 kun. Toshkent shahri bo'ylab bepul, viloyatlarga tanlangan hudud narxida.",
+  "Mahsulotni qabul qilayotganda tekshiring. Kafolat muddati mahsulot tavsifida ko'rsatilgan.",
+  "Qaytarish va almashtirish O'zbekiston Respublikasi qonunchiligiga muvofiq amalga oshiriladi."
+];
+var TERMS_INSTALL = [
+  "Muddatli to'lov Infinbank orqali rasmiylashtiriladi. Bank arizani ko'rib chiqadi va rad etishi mumkin.",
+  "Rasmiylashtirish uchun bank talab qiladigan hujjatlar (pasport va boshqalar) kerak bo'ladi.",
+  "Oylik to'lov har oy shartnomada belgilangan sanada to'lanadi.",
+  "⚠️ To'lov kechiktirilsa, bank shartnomasiga ko'ra jarima (penya) hisoblanadi va bu kredit tarixingizga salbiy ta'sir qiladi.",
+  "Aniq foiz, oylik to'lov miqdori va jarima shartlari bank bilan tuziladigan shartnomada ko'rsatiladi. Saytdagi oylik to'lov taxminiy."
+];
+function termsHTML(inst){
+  return `<div class="terms-h">📄 Xarid shartlari</div><ol>${TERMS_GENERAL.map(t=>`<li>${escH(t)}</li>`).join('')}</ol>` +
+    (inst ? `<div class="terms-h warn">🏦 Muddatli to'lov shartlari (${escH(INSTALL.bank)})</div><ol>${TERMS_INSTALL.map(t=>`<li>${escH(t)}</li>`).join('')}</ol>` : '');
+}
+var payState = {method:'cash', months: 12};
+function payChanged(){
+  const r = document.querySelector('input[name="payMethod"]:checked');
+  payState.method = r ? r.value : 'cash';
+  const total = cartTotalSum() + deliveryCost();
+  const box = document.getElementById('instBox');
+  if(box){
+    box.style.display = payState.method==='installment' ? 'block' : 'none';
+    box.innerHTML = `<div class="inst-chips">${INSTALL.plans.map(p=>`<button type="button" class="inst-chip${p.m===payState.months?' on':''}" onclick="payState.months=${p.m}; payChanged();"><b>${p.m} oy</b><span>${fmt(instMonthly(total, p.m))} so'm/oy</span></button>`).join('')}</div>
+      <div class="inst-sum">Jami: <b>${fmt(instTotal(total, payState.months))} so'm</b> · ${payState.months} oy davomida · ${escH(INSTALL.bank)}</div>`;
+  }
+  const t = document.getElementById('termsBox'); if(t) t.innerHTML = termsHTML(payState.method==='installment');
+  agreeChanged();
+}
+function pdPickMonths(m){
+  payState.months = m; payState.method = 'installment';
+  const p = (typeof PRODUCTS!=='undefined') && PRODUCTS.find(x=>String(x.id)===String(pdState && pdState.id));
+  document.querySelectorAll('#pdInstChips .inst-chip').forEach(b=>b.classList.toggle('on', Number(b.dataset.m)===m));
+  const sum = document.getElementById('pdInstSum');
+  if(sum && p){ const q = (pdState && pdState.qty) || 1, tot = p.price*q - lineDiscount(p.price, q); sum.innerHTML = `${m} oy × ~${fmt(instMonthly(tot, m))} so'm · jami <b>${fmt(instTotal(tot, m))} so'm</b><br><small style="display:inline; margin:0;">«Sotib olish» bossangiz, ${m} oylik bo'lib to'lash tanlangan holda ochiladi</small>`; }
+}
+function agreeChanged(){
+  const c = document.getElementById('agreeChk'), b = document.getElementById('orderSubmitBtn');
+  if(b) b.classList.toggle('btn-dim', !(c && c.checked));
+}
+</script>
 <script>
 const IC_PATHS = {"search": "<circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-3.5-3.5\"/>", "moon": "<path d=\"M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z\"/>", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4\"/>", "admin": "<path d=\"M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1\"/><circle cx=\"15\" cy=\"6\" r=\"2\"/><circle cx=\"9\" cy=\"12\" r=\"2\"/><circle cx=\"17\" cy=\"18\" r=\"2\"/>", "cart": "<circle cx=\"9\" cy=\"20\" r=\"1.4\"/><circle cx=\"18\" cy=\"20\" r=\"1.4\"/><path d=\"M2 3h3l2.6 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L22 7H6.2\"/>", "home": "<path d=\"M3 10.5 12 3l9 7.5\"/><path d=\"M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5\"/>", "grid": "<rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"2\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"2\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"2\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"2\"/>", "heart": "<path d=\"M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z\"/>", "user": "<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21a8 8 0 0 1 16 0\"/>", "logout": "<path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\"/><path d=\"m16 17 5-5-5-5M21 12H9\"/>", "truck": "<path d=\"M1 5h13v11H1zM14 9h4.5l3.5 4v3h-8z\"/><circle cx=\"5.5\" cy=\"18.5\" r=\"2\"/><circle cx=\"17.5\" cy=\"18.5\" r=\"2\"/>", "shield": "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z\"/><path d=\"m9 12 2 2 4-4\"/>", "card": "<rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2.5\"/><path d=\"M2 10h20M6 15h4\"/>", "phone": "<path d=\"M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z\"/>", "back": "<path d=\"M15 18l-6-6 6-6\"/>", "share": "<path d=\"M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14\"/>", "filter": "<path d=\"M3 5h18l-7 8.5V19l-4 2v-7.5z\"/>", "store": "<path d=\"M3 9.5 4.6 4h14.8L21 9.5M4 9.5V20h16V9.5M3 9.5h18M9.5 20v-6h5v6\"/>", "star": "<path d=\"m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z\"/>", "fire": "<path d=\"M12 22c4.4 0 7-2.9 7-6.8 0-4.4-3.5-6.7-4.6-10.2-.3 2.4-1.6 3.8-3 4.6.3-2.6-.6-5.4-3.4-7.6.2 3.6-4 6.3-4 11.6C4 18.5 7 22 12 22z\"/>", "tool": "<path d=\"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z\"/>", "tag": "<path d=\"M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z\"/><circle cx=\"7.5\" cy=\"7.5\" r=\"1.5\"/>"};
 function icon(n, cls, fill){ return `<svg class="${cls||'ic'}" viewBox="0 0 24 24" fill="${fill||'none'}" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC_PATHS[n]||''}</svg>`; }
@@ -1521,11 +1605,11 @@ function catEmoji(c){
 }
 function renderCats(){
   document.getElementById('subnavCats').innerHTML = CATS.map(c=>
-    `<div class="cat-chip ${c===activeCat?'active':''}" data-c="${escH(c)}" onclick="filterCat(this.dataset.c)"><i>${escH(catEmoji(c))}</i>${escH(c)}</div>`
+    `<div class="cat-chip ${c===activeCat?'active':''}" data-c="${escH(c)}" onclick="showStore(); filterCat(this.dataset.c); catScroll();"><i>${escH(catEmoji(c))}</i>${escH(c)}</div>`
   ).join('');
   const row = document.getElementById('mCatRow');
   if(row) row.innerHTML = CATS.map(c=>
-    `<div class="m-cat ${c===activeCat?'active':''}" data-c="${escH(c)}" onclick="filterCat(this.dataset.c); document.getElementById('catalogTop').scrollIntoView({behavior:'smooth'});"><i>${escH(catEmoji(c))}</i><span>${escH(c)}</span></div>`
+    `<div class="m-cat ${c===activeCat?'active':''}" data-c="${escH(c)}" onclick="filterCat(this.dataset.c); catScroll();"><i>${escH(catEmoji(c))}</i><span>${escH(c)}</span></div>`
   ).join('');
 }
 function filterCat(c){ activeCat=c; filters.cats=[]; renderCats(); renderFilterChips(); renderGrid(); }
@@ -1941,6 +2025,7 @@ function productCardHTML(p){
         ${starsFor(p.id)}
         <div class="card-desc">${escH(p.desc||'')}</div>
         <div style="margin:6px 0 2px;">${stockLabel(p)}</div>
+        ${instAllowed(p.price) ? `<div class="inst-line">oyiga <b>${fmt(instMin(p.price))} so'm</b>dan · 3–12 oy</div>` : ''}
         <div class="card-foot">
           <div class="price${isSaleP(p)?' on-sale':''}">${isSaleP(p) ? `<span class="save-tag">−${fmt(p.oldPrice - p.price)} so'm</span><s class="old-price">${fmt(p.oldPrice)} so'm</s>` : ''}<span class="promo-badge">Aksiya</span>${fmt(p.price)} <small>so'm</small></div>
           <div class="card-act" data-act="${escH(String(p.id))}">${cardActHTML(p)}</div>
@@ -2459,6 +2544,12 @@ function renderProductPage(){
           ${isSaleP(p) ? `<div class="pd-old"><span class="save-tag save-lg">−${fmt(p.oldPrice - p.price)} so'm</span><s>${fmt(p.oldPrice)} so'm</s><span class="pd-sale">−${salePct(p)}%</span></div>` : ''}
           <div class="pd-price${isSaleP(p)?' on-sale':''}">${fmt(p.price)} <small>so'm</small></div>
           <div class="pd-promo">🔥 3 ta olsangiz −5%, 6 ta olsangiz −10% chegirma</div>
+          ${instAllowed(p.price) ? `<div class="pd-inst">
+            <div class="pd-inst-h">🏦 Bo'lib to'lash — ${escH(INSTALL.bank)}</div>
+            <div class="inst-chips" id="pdInstChips">${INSTALL.plans.map(pl=>`<button type="button" class="inst-chip${pl.m===payState.months?' on':''}" data-m="${pl.m}" onclick="pdPickMonths(${pl.m})"><b>${pl.m} oy</b><span>${fmt(instMonthly(p.price, pl.m))} so'm/oy</span></button>`).join('')}</div>
+            <div class="inst-sum" id="pdInstSum">${payState.months} oy × ~${fmt(instMonthly(p.price, payState.months))} so'm · jami <b>${fmt(instTotal(p.price, payState.months))} so'm</b></div>
+            <small>Taxminiy hisob. Aniq foiz va oylik to'lov bank shartnomasida ko'rsatiladi. Kechiktirilsa jarima qo'llaniladi.</small>
+          </div>` : ''}
           ${st>0 ? `<div class="pd-qty-row">
             <span>Soni:</span>
             <div class="pd-qty"><button onclick="pdQty(-1)">−</button><b id="pdQtyVal">${pdState.qty}</b><button onclick="pdQty(1)">+</button></div>
@@ -2697,10 +2788,21 @@ function openCheckout(){
     </div>
     <div class="field"><label>Manzil</label><input id="custAddress" placeholder="Tuman, ko'cha, uy"></div>
     <div id="checkoutSummary">${cartSummaryHTML(true)}</div>
+    <div class="field"><label>To'lov usuli</label>
+      <div class="pay-opts">
+        <label class="pay-opt"><input type="radio" name="payMethod" value="cash" ${payState.method==='cash'?'checked':''} onchange="payChanged()"><span><b>Naqd yoki karta</b><small>Yetkazib berilganda to'laysiz</small></span></label>
+        ${instAllowed(cartTotalSum()) ? `<label class="pay-opt"><input type="radio" name="payMethod" value="installment" ${payState.method==='installment'?'checked':''} onchange="payChanged()"><span><b>Bo'lib to'lash — ${escH(INSTALL.bank)}</b><small>3, 6 yoki 12 oy</small></span></label>` : ''}
+      </div>
+      <div id="instBox" style="display:none;"></div>
+    </div>
+    <div class="terms" id="termsBox"></div>
+    <label class="agree"><input type="checkbox" id="agreeChk" onchange="agreeChanged()"><span>Xarid shartlarini o'qidim va <b>roziman</b></span></label>
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeCheckout()">Bekor qilish</button>
-      <button class="btn" onclick="submitOrder()">Tasdiqlash</button>
+      <button class="btn btn-dim" id="orderSubmitBtn" onclick="submitOrder()">Tasdiqlash</button>
     </div>`;
+  if(!instAllowed(cartTotalSum())) payState.method = 'cash';
+  payChanged();
 }
 function closeCheckout(){
   document.getElementById('checkoutModal').classList.remove('show');
@@ -2713,6 +2815,12 @@ async function submitOrder(){
   if(!name){ alert("Iltimos ismingizni kiriting"); return; }
   if(!region){ alert("Viloyat yoki shaharni tanlang"); return; }
   if(!address){ alert("Manzilni kiriting"); return; }
+  const agreeBox = document.getElementById('agreeChk');
+  if(!agreeBox || !agreeBox.checked){
+    const lab = agreeBox && agreeBox.closest('.agree'); if(lab){ lab.classList.remove('shake'); void lab.offsetWidth; lab.classList.add('shake'); lab.scrollIntoView({behavior:'smooth', block:'center'}); }
+    alert("Buyurtma berish uchun «Xarid shartlarini o'qidim va roziman» belgisini qo'ying");
+    return;
+  }
   if(!window.currentUser){ closeCheckout(); openCheckout(); return; }
   // Narx va chegirma SERVERDA hisoblanadi — bu yerdan faqat mahsulot ID va soni boradi
   const items = Object.entries(cart).map(([id,qty])=>({id:String(id), qty:Number(qty)}));
@@ -2720,7 +2828,8 @@ async function submitOrder(){
   if(btn){ btn.disabled = true; btn.textContent = "Yuborilmoqda..."; }
   let order;
   try{
-    order = (await api('placeOrder', {token: window.currentUser.token, items, name, address, region})).order;
+    order = (await api('placeOrder', {token: window.currentUser.token, items, name, address, region,
+      payment: payState.method, months: payState.method==='installment' ? payState.months : 0, agreed: true})).order;
   }catch(e){
     alert(e.message);
     if(btn){ btn.disabled = false; btn.textContent = "Tasdiqlash"; }
@@ -2737,7 +2846,7 @@ async function submitOrder(){
         <span style="width:8px; height:8px; border-radius:50%; background:var(--gold); display:inline-block;"></span>
         <span style="font-size:13px; font-weight:700;">Holat: ⏳ Kutilmoqda</span>
       </div>
-      <p>Buyurtma raqamingiz: <b style="color:var(--gold)">#${escH(order.id)}</b><br>Jami: <b>${fmt(order.total)} so'm</b><br>Admin tasdiqlab, tez orada siz bilan bog'lanadi.</p>
+      <p>Buyurtma raqamingiz: <b style="color:var(--gold)">#${escH(order.id)}</b><br>Jami: <b>${fmt(order.total)} so'm</b>${order.payment==='installment' ? `<br>🏦 Bo'lib to'lash: ${order.months} oy, taxminan oyiga <b>${fmt(order.monthly)} so'm</b><br><small>Operator bank arizasini rasmiylashtirish uchun bog'lanadi.</small>` : ''}<br>Admin tasdiqlab, tez orada siz bilan bog'lanadi.</p>
       <button class="btn" style="width:100%; justify-content:center; margin-top:10px;" onclick="closeCheckout(); openMyOrders();">🧾 Xaridlarim arxivini ko'rish</button>
       <button class="btn ghost" style="width:100%; justify-content:center; margin-top:8px;" onclick="closeCheckout()">Yopish</button>
     </div>`;
@@ -2874,7 +2983,7 @@ function renderAdmin(){
         <td>${escH(o.phone)}</td>
         <td style="font-size:12px;">${o.region ? escH(o.region)+'<br>' : ''}${escH(o.address||'')}</td>
         <td>${(o.items||[]).map(i=>escH(i.name)+' x'+escH(i.qty)).join(', ')}</td>
-        <td>${fmt(o.total)} so'm</td>
+        <td>${fmt(o.total)} so'm${o.payment==='installment' ? `<br><small style="color:#b27a16; font-weight:700;">🏦 ${Number(o.months)||''} oy · ~${fmt(o.monthly)}/oy</small>` : ''}</td>
         <td>${escH(o.date)}</td>
         <td>
           <select onchange="adminChangeOrderStatus('${safeId(o.id)}', this.value)" style="background:var(--bg2); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:4px 6px; font-size:12px;">
