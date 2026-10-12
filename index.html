@@ -1574,14 +1574,119 @@ const CODE_BOT = "brom_kod_bot";
 /* ---------- SERVER BILAN ALOQA ---------- */
 async function api(name, data){
   for(let i=0; i<60 && !window.FB_CALL; i++) await new Promise(r=>setTimeout(r,100));
-  if(!window.FB_CALL) throw new Error("Internet aloqasini tekshiring va sahifani yangilang.");
+  if(window.__serverDown && LOCAL_API[name]) return LOCAL_API[name](data || {});
+  if(!window.FB_CALL){
+    if(LOCAL_API[name] && window.FB && window.FB.raw){ window.__serverDown = true; return LOCAL_API[name](data || {}); }
+    throw new Error("Internet aloqasini tekshiring va sahifani yangilang.");
+  }
   try{ return await window.FB_CALL(name, data || {}); }
   catch(e){
-    if(e && e.code === 'functions/unauthenticated' && window.currentUser && name !== 'logout') clearSession();
+    const c = (e && e.code) || '';
+    if(/functions\/(internal|not-found|unavailable|deadline-exceeded)/.test(c) && LOCAL_API[name] && window.FB && window.FB.raw){
+      window.__serverDown = true;                         // server hali yuklanmagan — vaqtincha rejim
+      return LOCAL_API[name](data || {});
+    }
+    if(c === 'functions/unauthenticated' && window.currentUser && name !== 'logout') clearSession();
     const m = e && e.message;
     throw new Error(m && !/^(internal|INTERNAL)$/.test(m) ? m : "Server bilan bog'lanib bo'lmadi. Qayta urinib ko'ring.");
   }
 }
+/* ---------- VAQTINCHALIK REJIM (server yuklanmaguncha) ---------- */
+function sha256js(msg){
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const b=new TextEncoder().encode(msg), l=b.length, n=((l+9+63)>>6)<<6, m=new Uint8Array(n); m.set(b); m[l]=0x80;
+  const dv=new DataView(m.buffer); dv.setUint32(n-4, l*8); dv.setUint32(n-8, Math.floor(l/0x20000000));
+  let h=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]; const w=new Uint32Array(64), r=(x,k)=>(x>>>k)|(x<<(32-k));
+  for(let o=0;o<n;o+=64){
+    for(let i=0;i<16;i++) w[i]=dv.getUint32(o+i*4);
+    for(let i=16;i<64;i++){ const s0=r(w[i-15],7)^r(w[i-15],18)^(w[i-15]>>>3), s1=r(w[i-2],17)^r(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)|0; }
+    let [a,bb,c,d,e,f,g,hh]=h;
+    for(let i=0;i<64;i++){ const t1=(hh+(r(e,6)^r(e,11)^r(e,25))+((e&f)^(~e&g))+K[i]+w[i])|0, t2=((r(a,2)^r(a,13)^r(a,22))+((a&bb)^(a&c)^(bb&c)))|0; hh=g; g=f; f=e; e=(d+t1)|0; d=c; c=bb; bb=a; a=(t1+t2)|0; }
+    h=h.map((x,i)=>(x+[a,bb,c,d,e,f,g,hh][i])|0);
+  }
+  return h.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
+}
+async function sha256hex(t){
+  try{ if(window.crypto && crypto.subtle){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); } }catch(e){}
+  return sha256js(t);
+}
+function localErr(m){ throw new Error(m); }
+function localPhoneNorm(p){ let d = String(p||'').replace(/\D/g,''); if(d.length===9) d = '998'+d; if(!/^998\d{9}$/.test(d)) localErr("Telefon raqamni to'liq yozing (masalan 90 123 45 67)"); return d; }
+function localClean(v, max){ return String(v ?? '').replace(/[<>"'`\\]/g,'').replace(/\s+/g,' ').trim().slice(0, max||120); }
+async function localUser(u){
+  return { token: Array.from({length:64},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join(''),
+           user: { name: u.name, phone: u.phone || ('+'+u.phoneNorm), phoneNorm: u.phoneNorm, telegram: !!u.telegramChatId, rid: (await sha256hex('rid:'+u.phoneNorm)).slice(0,16) } };
+}
+const LOCAL_API = {
+  async registerPin(d){
+    const name = localClean(d.name, 60); if(name.length < 2) localErr("Ismingizni yozing");
+    const p = localPhoneNorm(d.phone), pin = String(d.pin||'');
+    if(!/^\d{4}$/.test(pin)) localErr("PIN 4 ta raqamdan iborat bo'lsin");
+    if(await window.FB.raw.get('users', p)) localErr("Bu raqam allaqachon ro'yxatdan o'tgan. «Kirish» bo'limidan kiring.");
+    const u = { name, phone: '+'+p, phoneNorm: p, telegramChatId: '', pinHash: await sha256hex('brom:'+p+':'+pin), createdAt: Date.now() };
+    await window.FB.raw.set('users', p, u);
+    return localUser(u);
+  },
+  async loginPin(d){
+    const p = localPhoneNorm(d.phone), pin = String(d.pin||'');
+    const u = await window.FB.raw.get('users', p);
+    if(!u) localErr("Bu raqam bilan profil topilmadi. Avval ro'yxatdan o'ting.");
+    if(!u.pinHash) localErr("Bu profil Telegram orqali ochilgan. Server yuklanmaguncha operatorga murojaat qiling: +998 33 531 84 94");
+    if(await sha256hex('brom:'+p+':'+pin) !== u.pinHash) localErr("PIN noto'g'ri");
+    return localUser({...u, phoneNorm: p});
+  },
+  async tgStart(){ localErr("Telegram orqali kirish server yuklangach ishlaydi. Hozircha PIN bilan kiring."); },
+  async tgVerify(){ localErr("Telegram orqali kirish server yuklangach ishlaydi."); },
+  async logout(){ return {ok:true}; },
+  async me(){
+    const u = window.currentUser; if(!u) localErr("Iltimos, qaytadan kiring");
+    const orders = (await window.FB.raw.where('orders', 'phoneNorm', u.phoneNorm)).sort((a,b)=>(b._ts||0)-(a._ts||0));
+    return { user: {name:u.name, phone:u.phone, phoneNorm:u.phoneNorm, telegram:!!u.telegram, rid:u.rid}, orders };
+  },
+  async placeOrder(d){
+    const u = window.currentUser; if(!u) localErr("Iltimos, qaytadan kiring");
+    if(d.agreed !== true) localErr("Buyurtma uchun xarid shartlariga rozilik kerak");
+    const reg = REGIONS.find(r=>r.name===d.region); if(!reg) localErr("Viloyat yoki shaharni tanlang");
+    const address = localClean(d.address, 200); if(address.length < 3) localErr("Manzilni kiriting");
+    const items = []; let subtotal = 0, discount = 0;
+    for(const it of (d.items||[])){
+      const p = PRODUCTS.find(x=>String(x.id)===String(it.id)); if(!p) localErr("Savatdagi mahsulot topilmadi, savatni yangilang");
+      const qty = Math.max(1, Math.floor(Number(it.qty)||1)), st = stockOf(p);
+      if(st < 999 && st < qty) localErr(st<=0 ? `«${p.name}» tugagan` : `«${p.name}» omborda faqat ${st} ta qoldi`);
+      const pct = discountPct(qty); subtotal += p.price*qty; discount += Math.round(p.price*qty*pct/100);
+      items.push({id:String(p.id), name:p.name, qty, price:p.price, discountPct:pct});
+    }
+    if(!items.length) localErr("Savat bo'sh");
+    const payment = d.payment==='installment' ? 'installment' : 'cash', months = payment==='installment' ? Number(d.months)||12 : 0;
+    const o = { id: 'B' + String(Date.now()).slice(-7) + Math.floor(10+Math.random()*90), name: localClean(d.name,60) || u.name, phone: u.phone, phoneNorm: u.phoneNorm,
+      address, region: reg.name, delivery: reg.cost, telegramChatId: '', status: 'Yangi', items, subtotal, discount,
+      total: subtotal - discount + reg.cost, payment, months, agreedAt: Date.now(),
+      date: new Date().toLocaleString('uz-UZ', {timeZone:'Asia/Tashkent'}), _ts: Date.now(), offline: true };
+    if(payment==='installment'){ o.monthly = instMonthly(o.total, months); o.bank = INSTALL.bank; }
+    await window.FB.raw.set('orders', o.id, o);
+    for(const it of items){ const p = PRODUCTS.find(x=>String(x.id)===it.id); if(p && stockOf(p) < 999){ p.stock = Math.max(0, stockOf(p) - it.qty); await window.FB.raw.set('products', String(p.id), {stock: p.stock}, true); } }
+    return { order: o };
+  },
+  async cancelMyOrder(d){
+    const o = await window.FB.raw.get('orders', String(d.orderId)); const u = window.currentUser;
+    if(!o || !u || o.phoneNorm !== u.phoneNorm) localErr("Buyurtma topilmadi");
+    if(!['Yangi','Jarayonda'].includes(o.status||'Yangi')) localErr("Bu buyurtmani endi bekor qilib bo'lmaydi");
+    await window.FB.raw.set('orders', String(d.orderId), {status:'Bekor qilindi'}, true);
+    return {ok:true};
+  },
+  async submitReview(d){
+    const u = window.currentUser; if(!u) localErr("Iltimos, qaytadan kiring");
+    const r = { id: u.rid + '_' + d.productId, productId: String(d.productId), name: localClean(u.name,60), owner: u.rid,
+      rating: Math.min(5, Math.max(1, Math.floor(Number(d.rating)||5))), text: localClean(d.text, 300), ts: Date.now(), date: new Date().toLocaleDateString('uz-UZ') };
+    await window.FB.raw.set('reviews', r.id, r);
+    return { review: r };
+  },
+  async sellerRequest(d){
+    await window.FB.raw.set('sellerRequests', 'S' + Date.now(), { name: localClean(d.name,60), phone: localClean(d.phone,20), products: (d.products||[]).slice(0,3), at: Date.now() });
+    return {ok:true};
+  }
+};
+
 function setSession(res){
   window.currentUser = {...res.user, token: res.token};
   try{ localStorage.setItem('bromUser', JSON.stringify(window.currentUser)); }catch(e){}
@@ -3872,7 +3977,7 @@ function bnSchedule(){
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getFirestore, collection, doc, setDoc, deleteDoc, getDoc, onSnapshot
+  getFirestore, collection, doc, setDoc, deleteDoc, getDoc, onSnapshot, query, where, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
@@ -3967,7 +4072,13 @@ onSnapshot(collection(db, "reviews"), (snap) => {
 }, warn("reviews"));
 
 // Admin amallari — qoidalar faqat admin bo'lsa ruxsat beradi
+const raw = {
+  async get(col, id){ const s = await getDoc(doc(db, col, String(id))); return s.exists() ? s.data() : null; },
+  async set(col, id, data, merge){ await setDoc(doc(db, col, String(id)), data, merge ? {merge:true} : undefined); },
+  async where(col, field, val){ const s = await getDocs(query(collection(db, col), where(field, '==', val))); const out = []; s.forEach(d=>out.push(d.data())); return out; }
+};
 window.FB = {
+  raw,
   async adminSignIn(email, pass){
     try{ await signInWithEmailAndPassword(auth, email, pass); }
     catch(e){
